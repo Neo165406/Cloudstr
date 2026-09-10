@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — VOLT//VOID</title>
+  <meta name="description" content="VOLT//VOID admin dashboard prototype — product catalog management UI.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="grain"></div>
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+  <div id="page-loader"><div class="loader-ring"></div></div>
+
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <a href="index.html" class="logo">VOLT<span>//</span>VOID</a>
+      <nav class="admin-nav">
+        <a href="#" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </a>
+        <a href="#products-panel">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></svg>
+          Products
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+          Categories
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>
+          Orders
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          Customers
+        </a>
+        <a href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p style="color:var(--muted); font-size:0.86rem; margin-top:0.3rem;">Prototype admin — changes apply to this session only.</p>
+        </div>
+        <button class="btn btn-primary" id="add-product-btn">Add product</button>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Total products</span>
+            <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/></svg></span>
+          </div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Featured</span>
+            <span class="icon-wrap"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.6 6.3 6.4.5-5 4.4 1.6 6.6-5.6-3.6-5.6 3.6 1.6-6.6-5-4.4 6.4-.5z"/></svg></span>
+          </div>
+          <div class="stat-value" id="stat-featured">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">Low stock</span>
+            <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span>
+          </div>
+          <div class="stat-value" id="stat-low-stock">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <span class="stat-label">New items</span>
+            <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg></span>
+          </div>
+          <div class="stat-value" id="stat-new">0</div>
+        </div>
+      </div>
+
+      <div class="admin-panel" id="products-panel">
+        <div class="admin-panel-head">
+          <h3>Product management</h3>
+          <span style="font-size:0.78rem;color:var(--muted);">Session-only data — resets on reload</span>
+        </div>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-product-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== Add / edit modal ===================== -->
+  <div class="modal-scrim" id="modal-scrim">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="modal-title">Add product</h3>
+        <button class="modal-close" id="modal-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="product-form">
+        <div class="form-group">
+          <label for="f-name">Product name</label>
+          <input type="text" id="f-name" name="name" required placeholder="e.g. AURORA EDGE">
+        </div>
+        <div class="form-group">
+          <label for="f-category">Category</label>
+          <select id="f-category" name="category">
+            <option value="devices">Devices</option>
+            <option value="pods">Pods</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="f-price">Price (USD)</label>
+          <input type="number" id="f-price" name="price" min="0" step="0.01" required placeholder="49.00">
+        </div>
+        <div class="form-group">
+          <label for="f-stock">Stock quantity</label>
+          <input type="number" id="f-stock" name="stock" min="0" step="1" required placeholder="20">
+        </div>
+        <div class="form-group">
+          <label for="f-description">Short description</label>
+          <textarea id="f-description" name="description" placeholder="One or two sentences about the product."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="filter-option" style="padding:0;">
+            <input type="checkbox" name="featured" id="f-featured"> Mark as featured
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Save product</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== Delete confirm modal ===================== -->
+  <div class="modal-scrim" id="confirm-scrim">
+    <div class="modal-box" style="max-width: 380px;">
+      <div class="modal-head">
+        <h3>Delete product</h3>
+        <button class="modal-close" id="confirm-close" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p id="confirm-text" style="color:var(--muted); font-size:0.88rem; margin-bottom:1.5rem;"></p>
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn btn-ghost btn-block" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-primary btn-block" id="confirm-delete-btn" style="background:linear-gradient(135deg,var(--danger),#c93b56); color:#1a0006;">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-region" aria-live="polite"></div>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
