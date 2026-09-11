@@ -14,9 +14,11 @@
   --text: #16202e;
   --muted: #6b7688;
   --muted-2: #97a0af;
-  --brand: #1a73e8;
-  --brand-dark: #1257b3;
-  --brand-tint: rgba(26, 115, 232, 0.08);
+  --brand: #1f51ff;
+  --brand-dark: #1339c9;
+  --brand-glow: #00c2ff;
+  --brand-tint: rgba(31, 81, 255, 0.09);
+  --brand-glow-shadow: 0 0 16px rgba(31, 81, 255, 0.45);
   --accent: #ff6a3d;
   --success: #1fa971;
   --success-tint: rgba(31, 169, 113, 0.1);
@@ -83,8 +85,9 @@ p.lede { color: var(--muted); max-width: 60ch; }
   white-space: nowrap;
 }
 .btn:hover { border-color: var(--brand); color: var(--brand); }
-.btn-primary { background: var(--brand); border-color: var(--brand); color: #fff; }
-.btn-primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-glow)); border-color: var(--brand); color: #fff; }
+.btn-primary:hover { background: linear-gradient(135deg, var(--brand-dark), var(--brand)); border-color: var(--brand-dark); color: #fff; box-shadow: var(--brand-glow-shadow); }
+.btn-primary:focus-visible { outline: 2px solid var(--brand-glow); outline-offset: 2px; }
 .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn-accent:hover { filter: brightness(0.94); color:#fff; }
 .btn-ghost { background: transparent; border-color: var(--border-strong); color: var(--muted); }
@@ -127,7 +130,7 @@ p.lede { color: var(--muted); max-width: 60ch; }
    Top hotline bar
    ========================================================================== */
 .hotline-bar {
-  background: var(--brand);
+  background: linear-gradient(90deg, var(--brand), var(--brand-dark) 140%);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 600;
@@ -155,7 +158,8 @@ p.lede { color: var(--muted); max-width: 60ch; }
 .logo { display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; color: var(--text); }
 .logo .logo-mark {
   width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(135deg, var(--brand), #37c6ff);
+  background: linear-gradient(135deg, var(--brand), var(--brand-glow));
+  box-shadow: var(--brand-glow-shadow);
   display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
 }
 .logo .logo-mark svg { width: 19px; height: 19px; }
@@ -192,7 +196,7 @@ p.lede { color: var(--muted); max-width: 60ch; }
   font-weight: 600; font-size: 0.92rem; color: var(--text);
   border: 1px solid transparent;
 }
-.drawer-link:hover, .drawer-link.active { background: var(--brand-tint); color: var(--brand); border-color: rgba(26,115,232,0.15); }
+.drawer-link:hover, .drawer-link.active { background: var(--brand-tint); color: var(--brand); border-color: rgba(31,81,255,0.2); }
 .drawer-link svg { width: 17px; height: 17px; flex-shrink: 0; }
 .drawer-group { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .drawer-group-head {
