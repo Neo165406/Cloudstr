@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order — cloudStr</title>
+  <meta name="description" content="Track a cloudStr order placed in this browser's prototype checkout.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="#">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="age-gate" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+    <div class="age-card">
+      <span class="badge-pill">18+ Only</span>
+      <h2 id="age-gate-title">Are you 18 years of age or older?</h2>
+      <p>cloudStr sells nicotine vaping products. You must confirm your age to continue.</p>
+      <div class="age-actions">
+        <button class="btn btn-ghost" id="age-exit">Exit</button>
+        <button class="btn btn-primary" id="age-enter">Yes, I'm 18+</button>
+      </div>
+      <p class="age-fine">Nicotine products are for adults only and are addictive. This is a UI prototype — no real payment is processed even though the cart and checkout flow work end to end.</p>
+    </div>
+  </div>
+
+  <div id="page-loader"><div class="loader-ring"></div></div>
+
+  <div class="hotline-bar">
+    <div class="wrap">
+      <a href="tel:+8801894007989">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.9 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1z"/></svg>
+        Hotline: 01894-007989
+      </a>
+      <span class="hotline-guarantee">100% Authentic Guaranteed</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="wrap navbar">
+      <div class="nav-left">
+        <button class="icon-btn" id="menu-btn" aria-label="Open categories">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+        </button>
+        <button class="icon-btn" id="search-btn" aria-label="Search products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+      </div>
+      <a href="index.html" class="logo">
+        <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15a4 4 0 0 1 .4-8 5.5 5.5 0 0 1 10.6 1.5A4 4 0 0 1 17 15H6z"/><path d="M9 19h1"/><path d="M14 19h1"/></svg></span>
+        cloud<span>Str</span>
+      </a>
+      <div class="nav-right">
+        <a href="account.html" class="icon-btn" aria-label="My account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        </a>
+        <a href="cart.html" class="icon-btn" aria-label="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          <span class="count-badge" id="cart-count" style="display:none;">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-scrim" id="drawer-scrim"></div>
+  <aside class="category-drawer" id="category-drawer" aria-label="All categories">
+    <div class="drawer-head">
+      <h3>All Categories</h3>
+      <button class="drawer-close" id="drawer-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <a href="index.html" class="drawer-link ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </a>
+      <a href="shop.html?filter=new" class="drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-1.5-2-1.5-3.5A2.5 2.5 0 0 1 12 6c3 0 5 3 5 6a5 5 0 0 1-8.5 3.5z"/></svg>
+        New Arrivals
+      </a>
+
+      <div class="drawer-group">
+        <button class="drawer-group-head" type="button">
+          Disposables
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="drawer-group-body">
+          <a href="shop.html?category=disposables">All Disposables</a>
+          <a href="shop.html?category=disposables&amp;sort=new">Newest Disposables</a>
+        </div>
+      </div>
+
+      <div class="drawer-group">
+        <button class="drawer-group-head" type="button">
+          Nic Salts
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="drawer-group-body">
+          <a href="shop.html?category=nic-salts">All Nic Salts</a>
+          <a href="shop.html?category=nic-salts&amp;sort=new">Newest Nic Salts</a>
+        </div>
+      </div>
+
+      <a href="shop.html?category=pod-devices" class="drawer-link">Pod Devices</a>
+      <a href="shop.html?category=podmod-devices" class="drawer-link">Podmod Devices</a>
+
+      <div class="drawer-group">
+        <button class="drawer-group-head" type="button">
+          Coils &amp; Cartridges
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="drawer-group-body">
+          <a href="shop.html?category=coils-cartridges">All Coils &amp; Cartridges</a>
+        </div>
+      </div>
+
+      <a href="shop.html?category=freebase-eliquid" class="drawer-link">Freebase E-liquid</a>
+
+      <a href="track-order.html" class="drawer-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        Track Order
+      </a>
+
+      <div class="drawer-contact">
+        <a href="tel:+8801894007989">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.9 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1z"/></svg>
+          01894-007989
+        </a>
+        <a href="contact.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Store Location &amp; Hours
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="search-overlay" id="search-overlay">
+    <div class="search-box">
+      <form data-nav-search>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" placeholder="Search products..." aria-label="Search products">
+      </form>
+    </div>
+  </div>
+
+  <main class="section">
+    <div class="wrap">
+      <h1 style="margin-bottom:0.5rem;">Track Order</h1>
+      <p class="lede" style="margin-bottom:1.75rem;">Enter an order ID from a confirmation screen to look it up (this browser's local order history only).</p>
+      <form id="track-form" style="max-width:420px; display:flex; gap:0.6rem; margin-bottom:2rem;">
+        <input type="text" id="track-id" placeholder="e.g. CS12345678" style="flex:1; padding:0.75rem 1rem; border:1px solid var(--border-strong); border-radius:var(--radius-sm);">
+        <button class="btn btn-primary" type="submit">Track</button>
+      </form>
+      <div id="track-result"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="trust-strip reveal">
+        <div class="trust-item">
+          <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+          <div><strong>Fast Delivery</strong><span>We provide fastest delivery</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          <div><strong>Online Support</strong><span>12 pm – 10 pm</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+          <div><strong>Nationwide Delivery</strong><span>Fastest nationwide delivery</span></div>
+        </div>
+        <div class="trust-item">
+          <span class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4L12 14.01l-3-3"/></svg></span>
+          <div><strong>Cash on Delivery</strong><span>Pay when your order arrives</span></div>
+        </div>
+      </div>
+
+      <div class="footer-brand reveal" style="margin-top:2.5rem;">
+        <a href="index.html" class="logo">
+          <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15a4 4 0 0 1 .4-8 5.5 5.5 0 0 1 10.6 1.5A4 4 0 0 1 17 15H6z"/></svg></span>
+          cloud<span>Str</span>
+        </a>
+        <p>cloudStr is a concept vape storefront prototype offering disposables, pod systems, e-liquids, and accessories. We put design and trust first — a UI concept, not a licensed retailer.</p>
+      </div>
+
+      <div class="footer-contact reveal">
+        <h4>Contact Us</h4>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Shop 18-21, 4th Floor, Concept Plaza, Dhaka (fictional address)
+        </div>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+          hello@cloudstr.example
+        </div>
+        <div class="footer-contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L7.9 9.9a16 16 0 0 0 6 6l1.4-1.4a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2.1z"/></svg>
+          01894-007989
+        </div>
+        <div class="footer-socials">
+          <a href="#" aria-label="Facebook (placeholder)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="#" aria-label="Instagram (placeholder)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg></a>
+          <a href="#" aria-label="YouTube (placeholder)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg></a>
+          <a href="https://wa.me/8801894007989" class="whatsapp" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.7 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-5-4.3-5.1-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5s.8 1.9.8 2.1.1.3 0 .5c-.1.2-.2.3-.3.5-.2.2-.3.3-.5.5-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.5 1.6.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.7-.1s1.8.9 2.1 1c.3.2.5.2.6.3.1.2.1.9-.1 1.6z"/></svg></a>
+        </div>
+      </div>
+
+      <div class="footer-cols reveal">
+        <div>
+          <h5>Help</h5>
+          <a href="contact.html">Contact Us</a>
+          <a href="track-order.html">Track Order</a>
+          <a href="#">Shipping Policy</a>
+          <a href="#">Returns</a>
+        </div>
+        <div>
+          <h5>My Account</h5>
+          <a href="account.html">Sign In</a>
+          <a href="cart.html">My Cart</a>
+          <a href="shop.html?filter=wishlist">Wishlist</a>
+          <a href="about.html">About Us</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        © 2026 cloudStr. Prototype concept — 18+ only. Nicotine is addictive.
+      </div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/8801894007989" class="wa-float" aria-label="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.7 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-5-4.3-5.1-4.5-.2-.2-1.2-1.6-1.2-3s.7-2.1 1-2.4c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5s.8 1.9.8 2.1.1.3 0 .5c-.1.2-.2.3-.3.5-.2.2-.3.3-.5.5-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.5 1.6.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.7-.1s1.8.9 2.1 1c.3.2.5.2.6.3.1.2.1.9-.1 1.6z"/></svg>
+  </a>
+
+  <div id="toast-region" aria-live="polite"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function renderOrderCard(order) {
+      const root = document.getElementById("track-result");
+      root.innerHTML = `
+        <div class="admin-panel">
+          <div class="admin-panel-head">
+            <h3>Order #${order.id}</h3>
+            <span class="badge-pill badge-new">${order.status}</span>
+          </div>
+          <div style="padding:1.25rem 1.4rem;">
+            <p style="font-size:0.86rem;color:var(--muted);margin-bottom:0.75rem;">Placed ${new Date(order.createdAt).toLocaleString()} · ${order.payment}</p>
+            ${order.items.map((i) => `<div class="summary-row"><span class="muted">${i.name} × ${i.qty}</span><span>${formatPrice(i.lineTotal)}</span></div>`).join("")}
+            <div class="summary-row total"><span>Total</span><span>${formatPrice(order.total)}</span></div>
+          </div>
+        </div>`;
+    }
+    document.getElementById("track-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = document.getElementById("track-id").value.trim().replace(/^#/, "");
+      const order = getOrders().find((o) => o.id.toLowerCase() === id.toLowerCase());
+      if (!order) {
+        document.getElementById("track-result").innerHTML = `<div class="empty-state"><p>No order found with that ID in this browser's history.</p></div>`;
+        return;
+      }
+      renderOrderCard(order);
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+      const recent = getOrders()[0];
+      if (recent) { document.getElementById("track-id").value = recent.id; renderOrderCard(recent); }
+    });
+  </script>
+</body>
+</html>
