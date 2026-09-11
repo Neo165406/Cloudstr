@@ -1,18 +1,11 @@
 /**
- * VOLT//VOID — App Shell
- * -----------------------
- * Shared behavior used on every page: age verification gate,
- * mobile navigation, wishlist state, toasts, scroll progress,
- * reveal-on-scroll, custom cursor, and the page loader.
- *
- * This file assumes products.js has already loaded when wishlist
- * helpers are needed.
+ * cloudStr — App Shell
+ * ----------------------
+ * Shared behavior for every page: age gate, category drawer,
+ * search overlay, toasts, reveal-on-scroll, page loader.
  */
 
-const STORAGE_KEYS = {
-  ageVerified: "vv_age_verified",
-  wishlist: "vv_wishlist",
-};
+const AGE_KEY = "cs_age_verified";
 
 /* ---------------------------------------------------------------
    Age gate
@@ -21,118 +14,77 @@ function initAgeGate() {
   const gate = document.getElementById("age-gate");
   if (!gate) return;
 
-  const verified = localStorage.getItem(STORAGE_KEYS.ageVerified) === "true";
-  if (verified) {
+  if (localStorage.getItem(AGE_KEY) === "true") {
     gate.hidden = true;
-    document.body.style.overflow = "";
     return;
   }
-
   document.body.style.overflow = "hidden";
 
-  const enterBtn = document.getElementById("age-enter");
-  const exitBtn = document.getElementById("age-exit");
-
-  enterBtn?.addEventListener("click", () => {
-    localStorage.setItem(STORAGE_KEYS.ageVerified, "true");
+  document.getElementById("age-enter")?.addEventListener("click", () => {
+    localStorage.setItem(AGE_KEY, "true");
     gate.hidden = true;
     document.body.style.overflow = "";
   });
-
-  exitBtn?.addEventListener("click", () => {
-    // Prototype-safe "exit": send the visitor away from adult content
-    // rather than trapping them on the page.
+  document.getElementById("age-exit")?.addEventListener("click", () => {
     window.location.href = "https://www.google.com";
   });
 }
 
 /* ---------------------------------------------------------------
-   Mobile navigation
+   Category drawer (left slide-in menu)
 --------------------------------------------------------------- */
-function initMobileNav() {
-  const toggle = document.getElementById("menu-toggle");
-  const nav = document.getElementById("mobile-nav");
-  const scrim = document.getElementById("nav-scrim");
-  if (!toggle || !nav || !scrim) return;
+function initDrawer() {
+  const drawer = document.getElementById("category-drawer");
+  const scrim = document.getElementById("drawer-scrim");
+  const openBtn = document.getElementById("menu-btn");
+  const closeBtn = document.getElementById("drawer-close");
+  if (!drawer || !scrim) return;
 
-  const close = () => {
-    toggle.classList.remove("open");
-    nav.classList.remove("open");
-    scrim.classList.remove("open");
-    toggle.setAttribute("aria-expanded", "false");
-  };
-  const open = () => {
-    toggle.classList.add("open");
-    nav.classList.add("open");
-    scrim.classList.add("open");
-    toggle.setAttribute("aria-expanded", "true");
-  };
+  const open = () => { drawer.classList.add("open"); scrim.classList.add("open"); };
+  const close = () => { drawer.classList.remove("open"); scrim.classList.remove("open"); };
 
-  toggle.addEventListener("click", () => {
-    toggle.classList.contains("open") ? close() : open();
-  });
+  openBtn?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
   scrim.addEventListener("click", close);
-  nav.querySelectorAll("a").forEach((a) => a.addEventListener("click", close));
-}
 
-/* ---------------------------------------------------------------
-   Wishlist (persisted locally — prototype only, no backend order)
---------------------------------------------------------------- */
-function getWishlist() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.wishlist)) || [];
-  } catch {
-    return [];
-  }
-}
+  document.querySelectorAll(".drawer-group-head").forEach((head) => {
+    head.addEventListener("click", () => {
+      head.closest(".drawer-group").classList.toggle("open");
+    });
+  });
 
-function isWishlisted(id) {
-  return getWishlist().includes(id);
-}
-
-function toggleWishlistItem(id) {
-  let list = getWishlist();
-  let added;
-  if (list.includes(id)) {
-    list = list.filter((x) => x !== id);
-    added = false;
-  } else {
-    list.push(id);
-    added = true;
-  }
-  localStorage.setItem(STORAGE_KEYS.wishlist, JSON.stringify(list));
-  updateWishlistBadge();
-  return added;
-}
-
-function updateWishlistBadge() {
-  const badge = document.getElementById("wishlist-count");
-  if (!badge) return;
-  const count = getWishlist().length;
-  badge.textContent = count;
-  badge.setAttribute("data-count", String(count));
-}
-
-function initWishlistDelegation() {
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-wishlist-id]");
-    if (!btn) return;
-    e.preventDefault();
-    const id = btn.getAttribute("data-wishlist-id");
-    const added = toggleWishlistItem(id);
-    btn.classList.toggle("active", added);
-    btn.setAttribute("aria-pressed", String(added));
-    showToast(added ? "Added to wishlist" : "Removed from wishlist");
+  // Active link highlighting
+  const path = window.location.pathname.split("/").pop() || "index.html";
+  drawer.querySelectorAll(".drawer-link").forEach((a) => {
+    const href = a.getAttribute("href") || "";
+    if (href.split("?")[0] === path) a.classList.add("active");
   });
 }
 
 /* ---------------------------------------------------------------
-   Cart icon — prototype placeholder (no real checkout)
+   Search overlay
 --------------------------------------------------------------- */
-function initCartPlaceholder() {
-  const cartBtn = document.getElementById("cart-btn");
-  cartBtn?.addEventListener("click", () => {
-    showToast("Prototype UI — checkout isn't implemented in this concept.");
+function initSearchOverlay() {
+  const overlay = document.getElementById("search-overlay");
+  const openBtn = document.getElementById("search-btn");
+  if (!overlay || !openBtn) return;
+
+  const open = () => {
+    overlay.classList.add("open");
+    setTimeout(() => overlay.querySelector("input")?.focus(), 100);
+  };
+  const close = () => overlay.classList.remove("open");
+
+  openBtn.addEventListener("click", open);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+
+  const form = overlay.querySelector("form");
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = form.querySelector("input").value.trim();
+    window.location.href = q ? `shop.html?q=${encodeURIComponent(q)}` : "shop.html";
   });
 }
 
@@ -155,27 +107,11 @@ function showToast(message, type = "default") {
     toast.style.opacity = "0";
     toast.style.transition = "opacity 0.3s ease";
     setTimeout(() => toast.remove(), 300);
-  }, 2800);
+  }, 2600);
 }
 
 /* ---------------------------------------------------------------
-   Scroll progress bar
---------------------------------------------------------------- */
-function initScrollProgress() {
-  const bar = document.getElementById("scroll-progress");
-  if (!bar) return;
-  const update = () => {
-    const h = document.documentElement;
-    const scrolled = h.scrollTop;
-    const height = h.scrollHeight - h.clientHeight;
-    bar.style.width = height > 0 ? `${(scrolled / height) * 100}%` : "0%";
-  };
-  document.addEventListener("scroll", update, { passive: true });
-  update();
-}
-
-/* ---------------------------------------------------------------
-   Reveal-on-scroll (single intersection observer, reused everywhere)
+   Reveal-on-scroll
 --------------------------------------------------------------- */
 function initRevealObserver() {
   const targets = document.querySelectorAll(".reveal:not(.in-view)");
@@ -193,55 +129,11 @@ function initRevealObserver() {
         }
       });
     },
-    { threshold: 0.15 }
+    { threshold: 0.12 }
   );
   targets.forEach((t) => observer.observe(t));
 }
-
-// Re-run the observer after dynamic content (product grids) is injected.
-function refreshReveal() {
-  initRevealObserver();
-}
-
-/* ---------------------------------------------------------------
-   Custom cursor (desktop pointer devices only)
---------------------------------------------------------------- */
-function initCustomCursor() {
-  if (!window.matchMedia("(pointer: fine)").matches) return;
-  const dot = document.getElementById("cursor-dot");
-  const ring = document.getElementById("cursor-ring");
-  if (!dot || !ring) return;
-
-  let ringX = 0, ringY = 0, mouseX = 0, mouseY = 0;
-  window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.left = `${mouseX}px`;
-    dot.style.top = `${mouseY}px`;
-  });
-
-  const animate = () => {
-    ringX += (mouseX - ringX) * 0.18;
-    ringY += (mouseY - ringY) * 0.18;
-    ring.style.left = `${ringX}px`;
-    ring.style.top = `${ringY}px`;
-    requestAnimationFrame(animate);
-  };
-  animate();
-
-  document.querySelectorAll("a, button").forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      ring.style.width = "44px";
-      ring.style.height = "44px";
-      ring.style.opacity = "0.85";
-    });
-    el.addEventListener("mouseleave", () => {
-      ring.style.width = "30px";
-      ring.style.height = "30px";
-      ring.style.opacity = "0.5";
-    });
-  });
-}
+function refreshReveal() { initRevealObserver(); }
 
 /* ---------------------------------------------------------------
    Page loader
@@ -249,28 +141,8 @@ function initCustomCursor() {
 function initPageLoader() {
   const loader = document.getElementById("page-loader");
   if (!loader) return;
-  window.addEventListener("load", () => {
-    setTimeout(() => loader.classList.add("hidden"), 200);
-  });
-  // Safety net in case 'load' already fired
-  if (document.readyState === "complete") {
-    setTimeout(() => loader.classList.add("hidden"), 200);
-  }
-}
-
-/* ---------------------------------------------------------------
-   Nav search — redirects to shop.html with a query param
---------------------------------------------------------------- */
-function initNavSearch() {
-  const forms = document.querySelectorAll("[data-nav-search]");
-  forms.forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = form.querySelector("input");
-      const q = input.value.trim();
-      window.location.href = q ? `shop.html?q=${encodeURIComponent(q)}` : "shop.html";
-    });
-  });
+  window.addEventListener("load", () => setTimeout(() => loader.classList.add("hidden"), 150));
+  if (document.readyState === "complete") setTimeout(() => loader.classList.add("hidden"), 150);
 }
 
 /* ---------------------------------------------------------------
@@ -278,19 +150,8 @@ function initNavSearch() {
 --------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   initAgeGate();
-  initMobileNav();
-  initWishlistDelegation();
-  initCartPlaceholder();
-  updateWishlistBadge();
-  initScrollProgress();
+  initDrawer();
+  initSearchOverlay();
   initRevealObserver();
-  initCustomCursor();
   initPageLoader();
-  initNavSearch();
-
-  // Active nav link highlighting
-  const path = window.location.pathname.split("/").pop() || "index.html";
-  document.querySelectorAll(".nav-links a, .mobile-nav a").forEach((a) => {
-    if (a.getAttribute("href") === path) a.classList.add("active");
-  });
 });
