@@ -146,11 +146,8 @@
   <main>
     <div class="wrap">
       <div class="hero-carousel reveal">
-        <div class="hero-track">
-          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=900&auto=format&fit=crop" alt="Nic salt bottles with tobacco leaf styling"></div>
-          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=900&auto=format&fit=crop" alt="Disposable device with cyan lighting"></div>
-          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1620288627223-53302f4e8c74?q=80&w=900&auto=format&fit=crop" alt="Pod device kit on a display stand"></div>
-        </div>
+        <div class="hero-track" id="hero-track"></div>
+        <div class="hero-fly" id="hero-fly" aria-hidden="true"></div>
       </div>
 
       <div class="section-strip reveal">
@@ -260,13 +257,13 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/products.js"></script>
-  <script src="js/card-motion.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("new-arrivals-grid").innerHTML = getNewArrivals(4).map(renderProductCard).join("");
+      renderHeroBanners("hero-track");
       renderBestSlider("best-track");
       renderModelsCollage("models-collage");
 
