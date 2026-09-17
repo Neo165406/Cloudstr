@@ -60,6 +60,14 @@
         </table>
       </div>
 
+      <div class="admin-panel" id="hero-panel">
+        <div class="admin-panel-head"><h3>Hero banners</h3><button class="btn btn-sm btn-primary" id="add-hero-btn">Add banner</button></div>
+        <table class="admin-table">
+          <thead><tr><th>Banner</th><th>Alt text</th><th>Actions</th></tr></thead>
+          <tbody id="admin-hero-body"></tbody>
+        </table>
+      </div>
+
       <div class="admin-panel" id="models-panel">
         <div class="admin-panel-head"><h3>Models collage</h3><button class="btn btn-sm btn-primary" id="add-model-btn">Add photo</button></div>
         <table class="admin-table">
@@ -100,6 +108,11 @@
           <div class="form-group"><label for="f-stock">Stock qty</label><input type="number" id="f-stock" name="stock" min="0" step="1" required placeholder="20"></div>
         </div>
         <div class="form-group"><label for="f-description">Short description</label><textarea id="f-description" name="description" rows="3" placeholder="One or two sentences."></textarea></div>
+        <div class="form-group">
+          <label>Product images (first one is the cover)</label>
+          <div id="image-inputs"></div>
+          <button type="button" class="btn btn-sm btn-ghost" id="add-image-btn">+ Add another image</button>
+        </div>
         <button type="submit" class="btn btn-primary btn-block">Save product</button>
       </form>
     </div>
@@ -132,12 +145,24 @@
     </div>
   </div>
 
+  <div class="modal-scrim" id="hero-modal-scrim">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="hero-modal-title">Add banner</h3>
+        <button class="modal-close" id="hero-modal-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
+      </div>
+      <form id="hero-form">
+        <div class="form-group"><label for="h-image">Image URL</label><input type="url" id="h-image" name="image" required placeholder="https://..."></div>
+        <div class="form-group"><label for="h-alt">Alt text</label><input type="text" id="h-alt" name="alt" placeholder="Short description of the photo"></div>
+        <button type="submit" class="btn btn-primary btn-block">Save banner</button>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-region" aria-live="polite"></div>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/products.js"></script>
-  <script src="js/card-motion.js"></script>
   <script src="js/featured.js"></script>
   <script src="js/cart.js"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { const l = document.getElementById("page-loader"); setTimeout(() => l.classList.add("hidden"), 150); });</script>
