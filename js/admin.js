@@ -9,6 +9,28 @@
  */
 
 let adminProducts = [];
+
+/* app.js is not loaded on admin.html — provide a local toast fallback. */
+if (typeof window.showToast !== "function") {
+  window.showToast = function (message, type) {
+    let region = document.getElementById("toast-region");
+    if (!region) {
+      region = document.createElement("div");
+      region.id = "toast-region";
+      region.setAttribute("aria-live", "polite");
+      document.body.appendChild(region);
+    }
+    const toast = document.createElement("div");
+    toast.className = "toast" + (type === "error" ? " error" : "");
+    toast.textContent = message;
+    region.appendChild(toast);
+    setTimeout(() => {
+      toast.style.transition = "opacity 0.3s ease";
+      toast.style.opacity = "0";
+      setTimeout(() => toast.remove(), 300);
+    }, 2600);
+  };
+}
 let editingModelId = null;
 let editingHeroId = null;
 
