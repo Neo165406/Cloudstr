@@ -10,16 +10,20 @@
 
 let adminProducts = [];
 let editingModelId = null;
+let editingHeroId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   adminProducts = getAllProducts();
   renderStatCards();
   renderAdminTable();
   renderBestPanel();
+  renderHeroPanel();
   renderModelsPanel();
   renderOrders();
   bindAdminUI();
   bindFeaturedUI();
+  bindHeroUI();
+  document.getElementById("add-image-btn")?.addEventListener("click", () => addImageInput());
 });
 
 function setText(id, value) {
@@ -49,8 +53,8 @@ function renderAdminTable() {
         <tr data-id="${p.id}">
           <td data-label="Product">
             <div class="admin-product-cell">
-              <img src="${p.images[0]}" alt="${p.name}">
-              <strong>${p.name}</strong>
+              <div class="admin-thumb-row">${p.images.slice(0, 3).map((src) => `<img src="${src}" alt="${p.name}">`).join("")}</div>
+              <strong>${p.name}${p.images.length > 1 ? ` <span style="color:var(--muted-2);font-weight:400;font-size:0.74rem;">(${p.images.length} images)</span>` : ""}</strong>
             </div>
           </td>
           <td data-label="Category">${CATEGORY_LABELS[p.category]}</td>
@@ -89,6 +93,139 @@ function renderBestPanel() {
         </tr>`
     )
     .join("");
+}
+
+/* ---------------------------------------------------------------
+   Hero banners panel
+--------------------------------------------------------------- */
+function renderHeroPanel() {
+  const tbody = document.getElementById("admin-hero-body");
+  if (!tbody) return;
+  const banners = getHeroBanners();
+  if (!banners.length) {
+    tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state">No banners yet.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = banners
+    .map(
+      (b) => `
+        <tr data-id="${b.id}">
+          <td data-label="Banner"><img src="${b.image}" alt="${b.alt || ""}" style="width:64px;height:40px;object-fit:cover;border-radius:6px;"></td>
+          <td data-label="Alt text">${b.alt || ""}</td>
+          <td data-label="Actions">
+            <div class="row-actions">
+              <button class="edit-hero-btn" data-id="${b.id}" title="Edit" aria-label="Edit banner">${iconEdit()}</button>
+              <button class="delete-hero-btn danger" data-id="${b.id}" title="Delete" aria-label="Delete banner">${iconTrash()}</button>
+            </div>
+          </td>
+        </tr>`
+    )
+    .join("");
+}
+
+function openHeroModal(banner = null) {
+  editingHeroId = banner ? banner.id : null;
+  const scrim = document.getElementById("hero-modal-scrim");
+  const form = document.getElementById("hero-form");
+  if (!scrim || !form) return;
+  form.reset();
+  document.getElementById("hero-modal-title").textContent = banner ? "Edit banner" : "Add banner";
+  if (banner) {
+    form.elements["image"].value = banner.image;
+    form.elements["alt"].value = banner.alt || "";
+  }
+  scrim.classList.add("open");
+}
+function closeHeroModal() {
+  editingHeroId = null;
+  document.getElementById("hero-modal-scrim")?.classList.remove("open");
+}
+
+function bindHeroUI() {
+  document.getElementById("add-hero-btn")?.addEventListener("click", () => openHeroModal());
+  document.getElementById("admin-hero-body")?.addEventListener("click", (e) => {
+    const id = e.target.closest("button")?.dataset.id;
+    if (!id) return;
+    const banner = getHeroBanners().find((b) => b.id === id);
+    if (!banner) return;
+    if (e.target.closest(".edit-hero-btn")) openHeroModal(banner);
+    if (e.target.closest(".delete-hero-btn")) {
+      saveHeroBanners(getHeroBanners().filter((b) => b.id !== id));
+      renderHeroPanel();
+      showToast("Banner removed");
+    }
+  });
+  document.getElementById("hero-modal-close")?.addEventListener("click", closeHeroModal);
+  document.getElementById("hero-modal-scrim")?.addEventListener("click", (e) => {
+    if (e.target.id === "hero-modal-scrim") closeHeroModal();
+  });
+  document.getElementById("hero-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const values = {
+      image: form.elements["image"].value.trim(),
+      alt: form.elements["alt"].value.trim(),
+    };
+    if (!values.image) {
+      showToast("Image URL is required", "error");
+      return;
+    }
+    let banners = getHeroBanners();
+    if (editingHeroId) {
+      const banner = banners.find((b) => b.id === editingHeroId);
+      Object.assign(banner, values);
+      showToast("Banner updated");
+    } else {
+      banners = [...banners, { id: "h" + Date.now(), ...values }];
+      showToast("Banner added");
+    }
+    saveHeroBanners(banners);
+    renderHeroPanel();
+    closeHeroModal();
+  });
+}
+
+/* ---------------------------------------------------------------
+   Product image inputs (multiple images)
+--------------------------------------------------------------- */
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=800&auto=format&fit=crop";
+
+function addImageInput(value = "") {
+  const holder = document.getElementById("image-inputs");
+  if (!holder) return;
+  const row = document.createElement("div");
+  row.className = "image-input-row";
+  const input = document.createElement("input");
+  input.type = "url";
+  input.className = "product-image-input";
+  input.placeholder = "https://...";
+  input.value = value;
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "image-remove-btn";
+  remove.setAttribute("aria-label", "Remove this image");
+  remove.textContent = "\u00d7";
+  remove.addEventListener("click", () => {
+    row.remove();
+    if (!holder.querySelector(".image-input-row")) addImageInput();
+  });
+  row.appendChild(input);
+  row.appendChild(remove);
+  holder.appendChild(row);
+}
+
+function setImageInputs(images) {
+  const holder = document.getElementById("image-inputs");
+  if (!holder) return;
+  holder.innerHTML = "";
+  const list = images && images.length ? images : [""];
+  list.forEach((src) => addImageInput(src));
+}
+
+function readImageInputs() {
+  return Array.from(document.querySelectorAll(".product-image-input"))
+    .map((i) => i.value.trim())
+    .filter(Boolean);
 }
 
 /* ---------------------------------------------------------------
@@ -280,6 +417,9 @@ function openProductModal(product = null) {
     form.elements["price"].value = product.price;
     form.elements["stock"].value = product.stock;
     form.elements["description"].value = product.description;
+    setImageInputs(product.images);
+  } else {
+    setImageInputs([]);
   }
   scrim.classList.add("open");
 }
@@ -298,18 +438,19 @@ function handleFormSubmit(e) {
     stock: parseInt(form.elements["stock"].value, 10) || 0,
     description: form.elements["description"].value.trim(),
   };
+  const images = readImageInputs();
   if (!values.name) {
     showToast("Product name is required", "error");
     return;
   }
   if (editingId) {
     const product = adminProducts.find((p) => p.id === editingId);
-    Object.assign(product, values);
+    Object.assign(product, values, { images: images.length ? images : product.images });
     showToast(`${product.name} updated`);
   } else {
     adminProducts.unshift({
       id: "p" + Date.now(), slug: values.name.toLowerCase().replace(/\s+/g, "-"),
-      images: ["https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=800&auto=format&fit=crop"],
+      images: images.length ? images : [FALLBACK_IMAGE],
       compareAt: null, isNew: true, specs: {}, reviews: [], ...values,
     });
     showToast(`${values.name} added (this session only)`);
