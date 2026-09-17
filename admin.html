@@ -21,6 +21,8 @@
       <nav class="admin-nav">
         <a href="#" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
         <a href="#products-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/></svg>Products</a>
+        <a href="#best-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Best Slider</a>
+        <a href="#models-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Models</a>
         <a href="#orders-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>Orders</a>
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>View Storefront</a>
       </nav>
@@ -30,7 +32,7 @@
       <div class="admin-topbar">
         <div>
           <h1>Dashboard</h1>
-          <p style="color:var(--muted); font-size:0.86rem; margin-top:0.3rem;">Products reset on reload; orders persist in this browser's local storage.</p>
+          <p style="color:var(--muted); font-size:0.86rem; margin-top:0.3rem;">Products reset on reload; orders, the Best Slider selection, and Models photos persist in this browser's local storage.</p>
         </div>
         <button class="btn btn-primary" id="add-product-btn">Add product</button>
       </div>
@@ -47,6 +49,22 @@
         <table class="admin-table">
           <thead><tr><th>Product</th><th>Category</th><th>Status</th><th>Price</th><th>Actions</th></tr></thead>
           <tbody id="admin-product-body"></tbody>
+        </table>
+      </div>
+
+      <div class="admin-panel" id="best-panel">
+        <div class="admin-panel-head"><h3>Best / New Products slider</h3><span style="font-size:0.78rem;color:var(--muted);">Tick to show on the homepage slider</span></div>
+        <table class="admin-table">
+          <thead><tr><th>Product</th><th>Category</th><th>Featured</th></tr></thead>
+          <tbody id="admin-best-body"></tbody>
+        </table>
+      </div>
+
+      <div class="admin-panel" id="models-panel">
+        <div class="admin-panel-head"><h3>Models collage</h3><button class="btn btn-sm btn-primary" id="add-model-btn">Add photo</button></div>
+        <table class="admin-table">
+          <thead><tr><th>Photo</th><th>Name</th><th>Caption</th><th>Actions</th></tr></thead>
+          <tbody id="admin-models-body"></tbody>
         </table>
       </div>
 
@@ -100,11 +118,26 @@
     </div>
   </div>
 
+  <div class="modal-scrim" id="model-modal-scrim">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="model-modal-title">Add photo</h3>
+        <button class="modal-close" id="model-modal-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
+      </div>
+      <form id="model-form">
+        <div class="form-group"><label for="m-name">Name</label><input type="text" id="m-name" name="name" required placeholder="e.g. Studio Look 1"></div>
+        <div class="form-group"><label for="m-image">Image URL</label><input type="url" id="m-image" name="image" required placeholder="https://..."></div>
+        <div class="form-group"><label for="m-caption">Caption</label><input type="text" id="m-caption" name="caption" placeholder="Short caption"></div>
+        <button type="submit" class="btn btn-primary btn-block">Save photo</button>
+      </form>
+    </div>
+  </div>
+
   <div id="toast-region" aria-live="polite"></div>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/products.js"></script>
+  <script src="js/featured.js"></script>
   <script src="js/cart.js"></script>
   <script>document.addEventListener("DOMContentLoaded", () => { const l = document.getElementById("page-loader"); setTimeout(() => l.classList.add("hidden"), 150); });</script>
   <script src="js/admin.js"></script>
