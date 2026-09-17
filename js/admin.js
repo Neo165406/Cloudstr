@@ -1,19 +1,25 @@
 /**
  * cloudStr — Admin Dashboard
  * ----------------------------
- * Product CRUD over an in-memory copy of the mock catalog, plus a
- * real Orders panel reading whatever has actually been placed
- * through checkout.html (stored in localStorage by js/cart.js).
+ * Product CRUD over an in-memory copy of the mock catalog, a real
+ * Orders panel reading whatever has actually been placed through
+ * checkout.html, and two admin-managed, localStorage-backed panels
+ * that drive the homepage: the Best/New Products slider and the
+ * Models collage (see js/featured.js).
  */
 
 let adminProducts = [];
+let editingModelId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   adminProducts = getAllProducts();
   renderStatCards();
   renderAdminTable();
+  renderBestPanel();
+  renderModelsPanel();
   renderOrders();
   bindAdminUI();
+  bindFeaturedUI();
 });
 
 function setText(id, value) {
@@ -59,6 +65,78 @@ function renderAdminTable() {
         </tr>`;
     })
     .join("");
+}
+
+/* ---------------------------------------------------------------
+   Best / New Products slider panel
+--------------------------------------------------------------- */
+function renderBestPanel() {
+  const tbody = document.getElementById("admin-best-body");
+  if (!tbody) return;
+  const bestIds = getBestProductIds();
+  tbody.innerHTML = adminProducts
+    .map(
+      (p) => `
+        <tr>
+          <td data-label="Product">
+            <div class="admin-product-cell">
+              <img src="${p.images[0]}" alt="${p.name}">
+              <strong>${p.name}</strong>
+            </div>
+          </td>
+          <td data-label="Category">${CATEGORY_LABELS[p.category]}</td>
+          <td data-label="Featured"><input type="checkbox" class="best-toggle" data-id="${p.id}" ${bestIds.includes(p.id) ? "checked" : ""}></td>
+        </tr>`
+    )
+    .join("");
+}
+
+/* ---------------------------------------------------------------
+   Models collage panel
+--------------------------------------------------------------- */
+function renderModelsPanel() {
+  const tbody = document.getElementById("admin-models-body");
+  if (!tbody) return;
+  const models = getModels();
+  if (!models.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">No photos yet.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = models
+    .map(
+      (m) => `
+        <tr data-id="${m.id}">
+          <td data-label="Photo"><img src="${m.image}" alt="${m.name}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;"></td>
+          <td data-label="Name">${m.name}</td>
+          <td data-label="Caption">${m.caption || ""}</td>
+          <td data-label="Actions">
+            <div class="row-actions">
+              <button class="edit-model-btn" data-id="${m.id}" title="Edit" aria-label="Edit ${m.name}">${iconEdit()}</button>
+              <button class="delete-model-btn danger" data-id="${m.id}" title="Delete" aria-label="Delete ${m.name}">${iconTrash()}</button>
+            </div>
+          </td>
+        </tr>`
+    )
+    .join("");
+}
+
+function openModelModal(model = null) {
+  editingModelId = model ? model.id : null;
+  const scrim = document.getElementById("model-modal-scrim");
+  const form = document.getElementById("model-form");
+  if (!scrim || !form) return;
+  form.reset();
+  document.getElementById("model-modal-title").textContent = model ? `Edit ${model.name}` : "Add photo";
+  if (model) {
+    form.elements["name"].value = model.name;
+    form.elements["image"].value = model.image;
+    form.elements["caption"].value = model.caption || "";
+  }
+  scrim.classList.add("open");
+}
+function closeModelModal() {
+  editingModelId = null;
+  document.getElementById("model-modal-scrim")?.classList.remove("open");
 }
 
 function renderOrders() {
@@ -112,8 +190,68 @@ function bindAdminUI() {
     adminProducts = adminProducts.filter((p) => p.id !== pendingDeleteId);
     renderStatCards();
     renderAdminTable();
+    renderBestPanel();
     showToast("Product removed (this session only)");
     closeConfirmModal();
+  });
+}
+
+/* ---------------------------------------------------------------
+   Best Slider + Models UI bindings
+--------------------------------------------------------------- */
+function bindFeaturedUI() {
+  document.getElementById("admin-best-body")?.addEventListener("change", (e) => {
+    if (!e.target.classList.contains("best-toggle")) return;
+    const id = e.target.dataset.id;
+    let ids = getBestProductIds();
+    ids = e.target.checked ? [...new Set([...ids, id])] : ids.filter((x) => x !== id);
+    setBestProductIds(ids);
+    showToast("Best Products slider updated");
+  });
+
+  document.getElementById("add-model-btn")?.addEventListener("click", () => openModelModal());
+
+  document.getElementById("admin-models-body")?.addEventListener("click", (e) => {
+    const id = e.target.closest("button")?.dataset.id;
+    if (!id) return;
+    const model = getModels().find((m) => m.id === id);
+    if (!model) return;
+    if (e.target.closest(".edit-model-btn")) openModelModal(model);
+    if (e.target.closest(".delete-model-btn")) {
+      saveModels(getModels().filter((m) => m.id !== id));
+      renderModelsPanel();
+      showToast("Photo removed");
+    }
+  });
+
+  document.getElementById("model-modal-close")?.addEventListener("click", closeModelModal);
+  document.getElementById("model-modal-scrim")?.addEventListener("click", (e) => {
+    if (e.target.id === "model-modal-scrim") closeModelModal();
+  });
+  document.getElementById("model-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const values = {
+      name: form.elements["name"].value.trim(),
+      image: form.elements["image"].value.trim(),
+      caption: form.elements["caption"].value.trim(),
+    };
+    if (!values.name || !values.image) {
+      showToast("Name and image URL are required", "error");
+      return;
+    }
+    let models = getModels();
+    if (editingModelId) {
+      const model = models.find((m) => m.id === editingModelId);
+      Object.assign(model, values);
+      showToast(`${model.name} updated`);
+    } else {
+      models = [{ id: "m" + Date.now(), ...values }, ...models];
+      showToast(`${values.name} added`);
+    }
+    saveModels(models);
+    renderModelsPanel();
+    closeModelModal();
   });
 }
 
@@ -178,6 +316,7 @@ function handleFormSubmit(e) {
   }
   renderStatCards();
   renderAdminTable();
+  renderBestPanel();
   closeProductModal();
 }
 
