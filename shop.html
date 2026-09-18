@@ -180,6 +180,7 @@
             <span class="result-count" id="result-count">Showing all products</span>
             <select class="sort-select" id="sort-select" aria-label="Sort products">
               <option value="relevance">Sort: Relevance</option>
+              <option value="customized">Sort: Customized</option>
               <option value="new">Sort: Newest</option>
               <option value="price-asc">Sort: Price (low to high)</option>
               <option value="price-desc">Sort: Price (high to low)</option>
@@ -287,7 +288,7 @@
       category: params.get("category") || "all",
       maxPrice: 6000,
       inStockOnly: false,
-      sort: params.get("sort") === "new" ? "new" : "relevance",
+      sort: ["customized", "new", "price-asc", "price-desc"].includes(params.get("sort")) ? params.get("sort") : "relevance",
     };
 
     function renderResults() {
@@ -332,7 +333,7 @@
     });
 
     document.addEventListener("DOMContentLoaded", () => {
-      if (state.sort === "new") document.getElementById("sort-select").value = "new";
+      document.getElementById("sort-select").value = state.sort;
       renderResults();
     });
   </script>
