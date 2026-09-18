@@ -569,61 +569,6 @@ input[type="range"] { width: 100%; accent-color: var(--brand); }
   .product-card.card-in:hover .product-discount { transform: none; }
 }
 
-/* Hero banner fly-through — product cut-outs curving top-right -> top-left */
-.hero-carousel { overflow: hidden; }
-.hero-fly {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-.hero-flyer {
-  position: absolute;
-  top: var(--fly-top, 8%);
-  left: 0;
-  width: var(--fly-size, 56px);
-  height: var(--fly-size, 56px);
-  animation-name: hero-fly-x;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
-.hero-flyer-inner {
-  display: block;
-  width: 100%;
-  height: 100%;
-  animation-name: hero-fly-y;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
-.hero-flyer img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 12px;
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
-  opacity: 0.92;
-}
-
-@keyframes hero-fly-x {
-  from { transform: translateX(115vw); }
-  to { transform: translateX(-30vw); }
-}
-@keyframes hero-fly-y {
-  0% { transform: translateY(-40%) rotate(18deg); opacity: 0; }
-  12% { opacity: 1; }
-  45% { transform: translateY(120%) rotate(-6deg); }
-  75% { transform: translateY(40%) rotate(-18deg); }
-  90% { opacity: 1; }
-  100% { transform: translateY(-45%) rotate(-28deg); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-fly { display: none; }
-}
-
 /* Admin: multiple product images */
 .image-input-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
 .image-input-row input { flex: 1; }
