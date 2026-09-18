@@ -237,6 +237,7 @@ function queryProducts({ search = "", category = "all", minPrice = 0, maxPrice =
   });
 
   switch (sort) {
+    case "customized": break; // Keep the catalog's curated product order.
     case "price-asc": results.sort((a, b) => a.price - b.price); break;
     case "price-desc": results.sort((a, b) => b.price - a.price); break;
     case "new": results.sort((a, b) => Number(b.isNew) - Number(a.isNew)); break;
