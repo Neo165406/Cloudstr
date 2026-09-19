@@ -14,7 +14,7 @@ const DEFAULT_MODELS = [
   { id: "m1", name: "Studio Look 1", image: "https://images.unsplash.com/photo-1622037022824-0c71d511ef3c?q=80&w=800&auto=format&fit=crop", caption: "Aero LUXE series" },
   { id: "m2", name: "Studio Look 2", image: "https://images.unsplash.com/photo-1605648916361-9bc12ad6a569?q=80&w=800&auto=format&fit=crop", caption: "Pod Devices lineup" },
   { id: "m3", name: "Studio Look 3", image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=800&auto=format&fit=crop", caption: "Disposables in hand" },
-  { id: "m4", name: "Studio Look 4", image: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=800&auto=format&fit=crop", caption: "New drop preview" },
+  { id: "m4", name: "Studio Look 4", image: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=900&auto=format&fit=crop", caption: "New drop preview" },
 ];
 
 const DEFAULT_HERO_BANNERS = [
@@ -51,7 +51,7 @@ function renderHeroBanners(trackId) {
   if (carousel) carousel.style.display = "";
 
   el.innerHTML = banners
-    .map((b) => `<div class=\"hero-slide\"><img src=\"${b.image}\" alt=\"${b.alt || \"\"}\" loading=\"eager\" decoding=\"async\"></div>`)
+    .map((b) => `<div class="hero-slide"><img src="${b.image}" alt="${b.alt || ""}" loading="eager" decoding="async"></div>`)
     .join("");
 
   let dots = carousel.querySelector(".hero-dots");
@@ -63,7 +63,7 @@ function renderHeroBanners(trackId) {
     carousel.appendChild(dots);
   }
   dots.innerHTML = banners
-    .map((_, i) => `<button type=\"button\" class=\"hero-dot${i === 0 ? \" is-active\" : \"\"}\" role=\"tab\" aria-label=\"Go to slide ${i + 1}\" data-index=\"${i}\"></button>`)
+    .map((_, i) => `<button type="button" class="hero-dot${i === 0 ? " is-active" : ""}" role="tab" aria-label="Go to slide ${i + 1}" data-index="${i}"></button>`)
     .join("");
 
   let prevBtn = carousel.querySelector(".hero-nav.prev");
@@ -73,7 +73,7 @@ function renderHeroBanners(trackId) {
     prevBtn.type = "button";
     prevBtn.className = "hero-nav prev";
     prevBtn.setAttribute("aria-label", "Previous slide");
-    prevBtn.innerHTML = `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M15 18l-6-6 6-6\"/></svg>`;
+    prevBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>`;
     carousel.appendChild(prevBtn);
   }
   if (!nextBtn) {
@@ -81,7 +81,7 @@ function renderHeroBanners(trackId) {
     nextBtn.type = "button";
     nextBtn.className = "hero-nav next";
     nextBtn.setAttribute("aria-label", "Next slide");
-    nextBtn.innerHTML = `<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M9 18l6-6-6-6\"/></svg>`;
+    nextBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
     carousel.appendChild(nextBtn);
   }
 
@@ -212,13 +212,14 @@ function renderModelsCollage(containerId) {
   if (wrap) wrap.style.display = "";
   el.innerHTML = models
     .map((m, i) => `
-      <figure class=\"collage-item ${i % 5 === 0 ? \"span-2\" : \"\"}\">
-        <img src=\"${m.image}\" alt=\"${m.name}\" loading=\"lazy\">
+      <figure class="collage-item ${i % 5 === 0 ? "span-2" : ""}">
+        <img src="${m.image}" alt="${m.name}" loading="lazy">
         <figcaption>${m.caption || m.name}</figcaption>
       </figure>
     `)
     .join("");
 }
+
 
 /* ---- News ticker (best products + offers) ---- */
 function renderNewsTicker(containerId) {
@@ -245,6 +246,7 @@ function renderNewsTicker(containerId) {
   }
 
   const items = [];
+  // interleave best + offers
   const max = Math.max(products.length, offers.length, 1);
   for (let i = 0; i < max; i++) {
     if (i < products.length) items.push(products[i]);
@@ -259,15 +261,16 @@ function renderNewsTicker(containerId) {
   const row = items
     .map(
       (it) =>
-        `<a class=\"news-ticker-item\" href=\"${it.href}\">` +
-        `<span class=\"dot\"></span>` +
-        `<span class=\"tag ${it.kind === \"offer\" ? \"offer\" : \"\"}\">${it.tag}</span>` +
+        `<a class="news-ticker-item" href="${it.href}">` +
+        `<span class="dot"></span>` +
+        `<span class="tag ${it.kind === "offer" ? "offer" : ""}">${it.tag}</span>` +
         `<span>${it.text}</span>` +
         `</a>`
     )
     .join("");
 
+  // duplicate for seamless loop
   el.innerHTML =
-    `<span class=\"news-ticker-label\">Live</span>` +
-    `<div class=\"news-ticker-track-wrap\"><div class=\"news-ticker-track\">${row}${row}</div></div>`;
+    `<span class="news-ticker-label">Live</span>` +
+    `<div class="news-ticker-track-wrap"><div class="news-ticker-track">${row}${row}</div></div>`;
 }
