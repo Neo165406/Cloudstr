@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>cloudStr — Vape Devices, Pods &amp; E-liquid</title>
+  <title>cloudStr — Vape Devices, Pods & E-liquid</title>
   <meta name="description" content="cloudStr is a concept vape storefront — disposables, pod systems, nic salts, and freebase e-liquid. 18+ only, prototype checkout.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="#">
@@ -86,7 +86,7 @@
         </button>
         <div class="drawer-group-body">
           <a href="shop.html?category=disposables">All Disposables</a>
-          <a href="shop.html?category=disposables&amp;sort=new">Newest Disposables</a>
+          <a href="shop.html?category=disposables&sort=new">Newest Disposables</a>
         </div>
       </div>
 
@@ -97,7 +97,7 @@
         </button>
         <div class="drawer-group-body">
           <a href="shop.html?category=nic-salts">All Nic Salts</a>
-          <a href="shop.html?category=nic-salts&amp;sort=new">Newest Nic Salts</a>
+          <a href="shop.html?category=nic-salts&sort=new">Newest Nic Salts</a>
         </div>
       </div>
 
@@ -106,11 +106,11 @@
 
       <div class="drawer-group">
         <button class="drawer-group-head" type="button">
-          Coils &amp; Cartridges
+          Coils & Cartridges
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="drawer-group-body">
-          <a href="shop.html?category=coils-cartridges">All Coils &amp; Cartridges</a>
+          <a href="shop.html?category=coils-cartridges">All Coils & Cartridges</a>
         </div>
       </div>
 
@@ -128,7 +128,7 @@
         </a>
         <a href="contact.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Store Location &amp; Hours
+          Store Location & Hours
         </a>
       </div>
     </div>
@@ -148,6 +148,8 @@
       <div class="hero-carousel reveal">
         <div class="hero-track" id="hero-track"></div>
       </div>
+
+      <div class="news-ticker reveal" id="news-ticker" aria-label="Offers and best products"></div>
 
       <div class="section-strip reveal">
         <h2>New Arrival</h2>
@@ -264,6 +266,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("new-arrivals-grid").innerHTML = getNewArrivals(4).map(renderProductCard).join("");
       renderHeroBanners("hero-track");
+      renderNewsTicker("news-ticker");
       renderBestSlider("best-track");
       renderModelsCollage("models-collage");
 
