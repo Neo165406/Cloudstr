@@ -1,2 +1,17 @@
-/* RESTORE - loading full file next */
-body { background: #080503; color: #fbf1e6; }
+/* cloudStr — restored styles + compact hero */
+@import url("https://cdn.jsdelivr.net/gh/Neo165406/Cloudstr@08a308487529e70049c6365c766dc74a24fb5065/css/style.css");
+
+/* Compact hero banner */
+.hero-carousel { margin-top: 0.75rem !important; }
+.hero-track { gap: 0.7rem !important; }
+.hero-slide {
+  width: min(68vw, 260px) !important;
+  aspect-ratio: 4/5 !important;
+}
+@media (min-width: 860px) {
+  .hero-slide {
+    width: 26% !important;
+    aspect-ratio: 16/10 !important;
+    max-width: 280px !important;
+  }
+}
