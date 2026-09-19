@@ -1,5 +1,44 @@
-/* cloudStr — styles + compact hero + news ticker */
+/* cloudStr — Brand system + compact hero + news ticker
+   ----------------------------------------------------
+   Color tokens (override / lock the design system):
+     --brand          Ember Orange   #FF7A1A
+     --brand-glow     Soft Amber     #FFB15C
+     --brand-dark     Deep Ember     #D9560C
+     --bg             Near Black     #080503
+     --surface        Deep Charcoal  #150D08
+     --text           Warm White     #FBF1E6
+     --muted          Soft Taupe     #B9A58E
+     --success        Mint           #2FE6A0
+     --border         Subtle Edge    rgba(255,255,255,0.08)
+*/
+
 @import url("https://cdn.jsdelivr.net/gh/Neo165406/Cloudstr@08a308487529e70049c6365c766dc74a24fb5065/css/style.css");
+
+/* ---- Brand color tokens (ensure consistency) ---- */
+:root {
+  --brand: #ff7a1a;
+  --brand-glow: #ffb15c;
+  --brand-dark: #d9560c;
+  --brand-tint: rgba(255, 122, 26, 0.14);
+  --brand-glow-shadow: 0 0 20px rgba(255, 122, 26, 0.55);
+
+  --bg: #080503;
+  --surface: #150d08;
+  --surface-2: #221407;
+
+  --text: #fbf1e6;
+  --muted: #b9a58e;
+  --muted-2: #6e5c48;
+
+  --success: #2fe6a0;
+  --success-tint: rgba(47, 230, 160, 0.16);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --font-display: "Poppins", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
 
 /* ---- Hero even smaller ---- */
 .hero-carousel { margin-top: 0.4rem !important; }
@@ -19,12 +58,18 @@
   }
 }
 
-/* ---- Continuous news / offers ticker ---- */
+/* ---- Continuous news / offers ticker (uses brand tokens) ---- */
 .news-ticker {
   margin: 0.9rem 0 0.25rem;
-  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: linear-gradient(90deg, rgba(255,122,26,0.12), rgba(21,13,8,0.95) 18%, rgba(21,13,8,0.95) 82%, rgba(255,122,26,0.12));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 122, 26, 0.12),
+    rgba(21, 13, 8, 0.95) 18%,
+    rgba(21, 13, 8, 0.95) 82%,
+    rgba(255, 122, 26, 0.12)
+  );
   overflow: hidden;
   position: relative;
   height: 42px;
@@ -42,11 +87,11 @@
 }
 .news-ticker::before {
   left: 0;
-  background: linear-gradient(90deg, #150d08, transparent);
+  background: linear-gradient(90deg, var(--surface), transparent);
 }
 .news-ticker::after {
   right: 0;
-  background: linear-gradient(270deg, #150d08, transparent);
+  background: linear-gradient(270deg, var(--surface), transparent);
 }
 .news-ticker-label {
   flex-shrink: 0;
@@ -58,9 +103,9 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, #ff7a1a, #ffb15c);
+  background: linear-gradient(135deg, var(--brand), var(--brand-glow));
   color: #fff;
-  box-shadow: 0 0 12px rgba(255,122,26,0.45);
+  box-shadow: 0 0 12px rgba(255, 122, 26, 0.45);
 }
 .news-ticker-track-wrap {
   flex: 1;
@@ -84,15 +129,15 @@
   padding: 0 1.35rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #fbf1e6;
+  color: var(--text);
   white-space: nowrap;
   text-decoration: none;
 }
-.news-ticker-item:hover { color: #ffb15c; }
+.news-ticker-item:hover { color: var(--brand-glow); }
 .news-ticker-item .dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: #ff7a1a;
-  box-shadow: 0 0 8px rgba(255,122,26,0.7);
+  background: var(--brand);
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.7);
   flex-shrink: 0;
 }
 .news-ticker-item .tag {
@@ -100,14 +145,14 @@
   font-weight: 800;
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
-  background: rgba(255,122,26,0.2);
-  color: #ffb15c;
-  border: 1px solid rgba(255,122,26,0.35);
+  background: rgba(255, 122, 26, 0.2);
+  color: var(--brand-glow);
+  border: 1px solid rgba(255, 122, 26, 0.35);
 }
 .news-ticker-item .tag.offer {
-  background: rgba(47,230,160,0.16);
-  color: #2fe6a0;
-  border-color: rgba(47,230,160,0.35);
+  background: var(--success-tint);
+  color: var(--success);
+  border-color: rgba(47, 230, 160, 0.35);
 }
 @keyframes news-scroll {
   from { transform: translateX(0); }
