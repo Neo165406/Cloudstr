@@ -2,19 +2,19 @@
 @import url("https://cdn.jsdelivr.net/gh/Neo165406/Cloudstr@08a308487529e70049c6365c766dc74a24fb5065/css/style.css");
 
 /* ---- Hero even smaller ---- */
-.hero-carousel { margin-top: 0.5rem !important; }
-.hero-track { gap: 0.55rem !important; }
+.hero-carousel { margin-top: 0.4rem !important; }
+.hero-track { gap: 0.45rem !important; }
 .hero-slide {
-  width: min(52vw, 180px) !important;
+  width: min(42vw, 140px) !important;
   aspect-ratio: 1/1 !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
 }
-.hero-nav { width: 32px !important; height: 32px !important; }
-.hero-dots { margin-top: 0.55rem !important; }
+.hero-nav { width: 28px !important; height: 28px !important; }
+.hero-dots { margin-top: 0.4rem !important; }
 @media (min-width: 860px) {
   .hero-slide {
-    width: 18% !important;
-    max-width: 200px !important;
+    width: 14% !important;
+    max-width: 160px !important;
     aspect-ratio: 5/4 !important;
   }
 }
