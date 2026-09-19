@@ -1,4 +1,4 @@
-/* cloudStr — Brand system + compact hero + news ticker
+/* cloudStr — Brand system + compact hero + news ticker + product motion
    ----------------------------------------------------
    Color tokens:
      --brand          Ember Orange   #FF7A1A
@@ -91,7 +91,7 @@
   }
 }
 
-/* ---- News ticker — more prominent + SPECIAL label ---- */
+/* ---- News ticker — prominent + SPECIAL ---- */
 .news-ticker {
   margin: 1rem 0 0.4rem;
   border: 1px solid rgba(255, 122, 26, 0.35);
@@ -202,7 +202,91 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+/* ---- Product show animation (enhanced) ---- */
+.product-grid .product-card,
+.product-card,
+.best-track .product-card {
+  opacity: 0 !important;
+  transform: translateY(28px) scale(0.94) !important;
+  filter: blur(4px);
+  transition:
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease !important;
+}
+.product-card.card-in,
+.best-track .product-card.card-in {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  filter: blur(0);
+}
+.product-card.card-in:hover {
+  transform: translateY(-6px) scale(1.02) !important;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 122, 26, 0.35),
+    0 0 28px -4px rgba(255, 122, 26, 0.4) !important;
+  border-color: rgba(255, 122, 26, 0.5) !important;
+}
+.product-card.card-in:active {
+  transform: translateY(-2px) scale(0.99) !important;
+}
+
+/* Image zoom + soft shine on hover */
+.product-media {
+  overflow: hidden;
+}
+.product-media img {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.product-card.card-in:hover .product-media img {
+  transform: scale(1.08) !important;
+}
+.product-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  pointer-events: none;
+  z-index: 1;
+}
+.product-card.card-in:hover .product-media::after {
+  transition: transform 0.7s ease;
+  transform: translateX(120%);
+}
+
+/* CTA pop on card enter */
+.product-card .product-cta {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s ease;
+}
+.product-card.card-in:hover .product-cta.in-stock {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 122, 26, 0.4);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .news-ticker-track { animation: none; }
   .news-ticker-label { animation: none; }
+  .product-grid .product-card,
+  .product-card,
+  .best-track .product-card {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .product-card.card-in:hover,
+  .product-card.card-in:hover .product-media img {
+    transform: none !important;
+  }
+  .product-media::after { display: none; }
 }
