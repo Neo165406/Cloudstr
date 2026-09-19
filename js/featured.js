@@ -271,6 +271,6 @@ function renderNewsTicker(containerId) {
 
   // duplicate for seamless loop
   el.innerHTML =
-    `<span class="news-ticker-label">Live</span>` +
+    `<span class="news-ticker-label">Special</span>` +
     `<div class="news-ticker-track-wrap"><div class="news-ticker-track">${row}${row}</div></div>`;
 }
