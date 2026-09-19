@@ -1,13 +1,16 @@
 /**
  * cloudStr — Product card motion
- * Adds `.card-in` to product cards as they scroll into view, and re-arms
- * for cards injected later (grids are rendered client-side).
+ * Staggered entrance when products scroll into view.
+ * Works for product-grid, best-slider, and dynamically injected cards.
  */
 (function () {
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function markAll(cards) {
-    for (var i = 0; i < cards.length; i++) cards[i].classList.add("card-in");
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].style.transitionDelay = (i % 6) * 0.08 + "s";
+      cards[i].classList.add("card-in");
+    }
   }
 
   var observer = null;
@@ -17,26 +20,32 @@
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
           var card = entry.target;
-          var grid = card.parentElement;
-          var index = grid ? Array.prototype.indexOf.call(grid.children, card) : 0;
-          card.style.transitionDelay = (index % 4) * 0.07 + "s";
+          var parent = card.parentElement;
+          var index = parent ? Array.prototype.indexOf.call(parent.children, card) : 0;
+          card.style.transitionDelay = (index % 6) * 0.09 + "s";
           card.classList.add("card-in");
           observer.unobserve(card);
         });
       },
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.06, rootMargin: "0px 0px -6% 0px" }
     );
   }
 
   function scan() {
     var cards = document.querySelectorAll(".product-card:not(.card-in)");
     if (!cards.length) return;
-    if (!observer) { markAll(cards); return; }
+    if (!observer) {
+      markAll(cards);
+      return;
+    }
     for (var i = 0; i < cards.length; i++) observer.observe(cards[i]);
   }
 
   function start() {
     scan();
+    // Re-scan shortly after DOMContentLoaded grids render
+    setTimeout(scan, 120);
+    setTimeout(scan, 400);
     if ("MutationObserver" in window) {
       new MutationObserver(function () {
         window.requestAnimationFrame(scan);
