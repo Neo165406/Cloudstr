@@ -1,11 +1,12 @@
 /**
  * cloudStr — Admin Dashboard
  * ----------------------------
- * Product CRUD over an in-memory copy of the mock catalog, a real
- * Orders panel reading whatever has actually been placed through
- * checkout.html, and two admin-managed, localStorage-backed panels
- * that drive the homepage: the Best/New Products slider and the
- * Models collage (see js/featured.js).
+ * Product CRUD (saved to localStorage via saveProducts in products.js,
+ * so the storefront sees the changes), a real Orders panel reading
+ * whatever has actually been placed through checkout.html, and
+ * admin-managed, localStorage-backed panels that drive the homepage:
+ * the Best/New Products slider and the Models collage (see
+ * js/featured.js).
  */
 
 let adminProducts = [];
@@ -33,6 +34,15 @@ if (typeof window.showToast !== "function") {
 }
 let editingModelId = null;
 let editingHeroId = null;
+
+/* Persist the current admin catalog so the storefront picks it up. */
+function persistProducts() {
+  if (!saveProducts(adminProducts)) {
+    showToast("Couldn't save changes (browser storage unavailable)", "error");
+    return false;
+  }
+  return true;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   adminProducts = getAllProducts();
@@ -347,10 +357,11 @@ function bindAdminUI() {
   document.getElementById("confirm-delete-btn")?.addEventListener("click", () => {
     if (!pendingDeleteId) return;
     adminProducts = adminProducts.filter((p) => p.id !== pendingDeleteId);
+    persistProducts();
     renderStatCards();
     renderAdminTable();
     renderBestPanel();
-    showToast("Product removed (this session only)");
+    showToast("Product removed");
     closeConfirmModal();
   });
 }
@@ -417,7 +428,7 @@ function bindFeaturedUI() {
 let pendingDeleteId = null;
 function confirmDelete(product) {
   pendingDeleteId = product.id;
-  document.getElementById("confirm-text").textContent = `Delete "${product.name}"? This only affects this session.`;
+  document.getElementById("confirm-text").textContent = `Delete "${product.name}"? This will remove it from the storefront.`;
   document.getElementById("confirm-scrim").classList.add("open");
 }
 function closeConfirmModal() {
@@ -475,8 +486,9 @@ function handleFormSubmit(e) {
       images: images.length ? images : [FALLBACK_IMAGE],
       compareAt: null, isNew: true, specs: {}, reviews: [], ...values,
     });
-    showToast(`${values.name} added (this session only)`);
+    showToast(`${values.name} added`);
   }
+  persistProducts();
   renderStatCards();
   renderAdminTable();
   renderBestPanel();

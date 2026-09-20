@@ -4,6 +4,10 @@
  * Fictional catalog data + query helpers, modeled on a real
  * multi-category vape retailer's structure (disposables, nic salts,
  * pod devices, podmod devices, coils/cartridges, freebase e-liquid).
+ *
+ * SEED_PRODUCTS is the built-in catalog. Admin edits are saved to
+ * localStorage (see saveProducts) and take priority over the seed on
+ * every page load, so the storefront and admin share one catalog.
  * Swap the implementation for Firestore later without touching callers.
  */
 
@@ -18,7 +22,7 @@ const CATEGORY_LABELS = {
   "freebase-eliquid": "Freebase E-liquid",
 };
 
-const MOCK_PRODUCTS = [
+const SEED_PRODUCTS = [
   // ---- Disposables ----
   {
     id: "p1", slug: "streak-bar-mango-ice", name: "Streak Bar 40000 Puffs — Mango Ice",
@@ -207,6 +211,34 @@ const MOCK_PRODUCTS = [
     reviews: [],
   },
 ];
+
+/* ---------------------------------------------------------------
+   Persistence (localStorage)
+   Admin edits are written with saveProducts(); every page loads the
+   saved catalog here, falling back to the seed on first run or if
+   storage is unavailable/corrupt.
+--------------------------------------------------------------- */
+const PRODUCTS_STORAGE_KEY = "cloudstr_products";
+
+function loadProducts() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCTS_STORAGE_KEY));
+    if (Array.isArray(saved)) return saved;
+  } catch (e) {}
+  return SEED_PRODUCTS.slice();
+}
+
+function saveProducts(list) {
+  try {
+    localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(list));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// The live catalog used by every helper below.
+const MOCK_PRODUCTS = loadProducts();
 
 /* ---------------------------------------------------------------
    Query helpers
