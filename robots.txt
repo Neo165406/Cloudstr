@@ -1,4 +1,4 @@
-# Cloudstr is currently a prototype storefront, not a licensed retail site.
-# Keep search engines able to crawl pages and see the site-wide noindex directive.
 User-agent: *
 Allow: /
+
+Sitemap: https://cloudstr.vercel.app/sitemap.xml
