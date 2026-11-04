@@ -239,7 +239,7 @@ function renderNewsTicker(containerId) {
       tag: "BEST",
       kind: "best",
       text: p.name + (p.price != null ? " — ৳" + p.price : ""),
-      href: "product.html?id=" + encodeURIComponent(p.id),
+      href: "product.html?slug=" + encodeURIComponent(p.slug),
     }));
   } catch (e) {
     products = [];

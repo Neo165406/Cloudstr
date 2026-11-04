@@ -54,7 +54,7 @@ function initDrawer() {
   });
 
   // Active link highlighting
-  const path = window.location.pathname.split("/").pop() || "index.html";
+  const path = (window.location.pathname.split("/").pop() || "index").replace(/\.html$/, "") + ".html";
   drawer.querySelectorAll(".drawer-link").forEach((a) => {
     const href = a.getAttribute("href") || "";
     if (href.split("?")[0] === path) a.classList.add("active");
