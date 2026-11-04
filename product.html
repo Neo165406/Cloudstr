@@ -234,7 +234,9 @@
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>
-    const slug = new URLSearchParams(window.location.search).get("slug");
+    const slug = new URLSearchParams(window.location.search).get("slug")
+      || (window.location.pathname.match(/^\/product\/([^/?#]+)/) || [])[1]
+      || null;
     const product = slug ? getProductBySlug(slug) : null;
     const root = document.getElementById("product-root");
 
