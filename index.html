@@ -278,7 +278,10 @@
         const opacity = Math.max(5, Math.min(100, Number(item.opacity) || 85));
         const rotation = Math.max(-180, Math.min(180, Number(item.rotation) || 0));
         const safe = url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-        return '<img class="background-decor-item" src="' + safe + '" alt="" loading="lazy" style="left:' + x + '%;top:' + y + '%;width:' + width + 'px;opacity:' + opacity/100 + ';transform:rotate(' + rotation + 'deg)">';
+        const opacityValue = opacity / 100;
+        const layerMode = item.layer === "front" ? " decor-front" : "";
+        return '<img class="background-decor-item' + layerMode + '" src="' + safe + '" alt="" loading="eager" style="left:' + x + '%;top:' + y + '%;width:' + width + 'px;opacity:' + opacityValue + ';transform:rotate(' + rotation + 'deg)">';
+
       }).join("");
     }
 
