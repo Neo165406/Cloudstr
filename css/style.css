@@ -1014,3 +1014,49 @@ input:focus, select:focus, textarea:focus {
 .logo.logo-image { display:inline-flex; align-items:center; gap:0; width:clamp(150px, 19vw, 220px); }
 .logo.logo-image img { display:block; width:100%; height:auto; max-height:58px; object-fit:contain; }
 @media(max-width:520px){.logo.logo-image{width:clamp(116px, 34vw, 150px)}.logo.logo-image img{max-height:44px}}
+
+
+/* Fix: keep model collage captions fully visible below each image */
+.models-collage .collage-item {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0;
+  height: auto !important;
+  overflow: hidden;
+}
+.models-collage .collage-item img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.models-collage .collage-item figcaption {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.45 !important;
+  font-size: .82rem !important;
+  font-weight: 600;
+  text-align: left;
+  background: #111713 !important;
+  color: #f1f4ed !important;
+  opacity: 1 !important;
+  transform: none !important;
+  z-index: 1;
+}
+@media (max-width: 600px) {
+  .models-collage .collage-item figcaption {
+    min-height: 44px;
+    padding: 10px 11px !important;
+    font-size: .76rem !important;
+  }
+}
