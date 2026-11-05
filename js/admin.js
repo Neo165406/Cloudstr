@@ -501,6 +501,7 @@ function bindAdminUI() {
     if (e.target.id === "modal-scrim") closeProductModal();
   });
   document.getElementById("product-form")?.addEventListener("submit", handleFormSubmit);
+  document.getElementById("add-spec-btn")?.addEventListener("click", () => addSpecInput());
 
   document.getElementById("confirm-close")?.addEventListener("click", closeConfirmModal);
   document.getElementById("confirm-cancel")?.addEventListener("click", closeConfirmModal);
@@ -589,6 +590,35 @@ function closeConfirmModal() {
   document.getElementById("confirm-scrim")?.classList.remove("open");
 }
 
+function addSpecInput(key = "", value = "") {
+  const holder = document.getElementById("spec-inputs");
+  if (!holder) return;
+  const row = document.createElement("div");
+  row.className = "spec-input-row";
+  row.style.cssText = "display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;margin:.5rem 0;";
+  row.innerHTML = '<input type="text" class="spec-key" placeholder="Label (e.g. Capacity)" maxlength="60"><input type="text" class="spec-value" placeholder="Value" maxlength="120"><button type="button" class="btn btn-sm btn-ghost" aria-label="Remove specification">×</button>';
+  row.querySelector(".spec-key").value = key;
+  row.querySelector(".spec-value").value = value;
+  row.querySelector("button").addEventListener("click", () => row.remove());
+  holder.appendChild(row);
+}
+function setSpecInputs(specs = {}) {
+  const holder = document.getElementById("spec-inputs");
+  if (!holder) return;
+  holder.innerHTML = "";
+  Object.entries(specs || {}).forEach(([key, value]) => addSpecInput(key, value));
+  if (!holder.children.length) addSpecInput();
+}
+function readSpecInputs() {
+  const specs = {};
+  document.querySelectorAll("#spec-inputs .spec-input-row").forEach((row) => {
+    const key = row.querySelector(".spec-key").value.trim();
+    const value = row.querySelector(".spec-value").value.trim();
+    if (key && value) specs[key] = value;
+  });
+  return specs;
+}
+
 function openProductModal(product = null) {
   const scrim = document.getElementById("modal-scrim");
   const form = document.getElementById("product-form");
@@ -604,8 +634,10 @@ function openProductModal(product = null) {
     form.elements["stock"].value = product.stock;
     form.elements["description"].value = product.description;
     setImageInputs(product.images);
+    setSpecInputs(product.specs || {});
   } else {
     setImageInputs([]);
+    setSpecInputs({});
   }
   scrim.classList.add("open");
 }
@@ -623,6 +655,7 @@ function handleFormSubmit(e) {
     price: parseFloat(form.elements["price"].value) || 0,
     stock: parseInt(form.elements["stock"].value, 10) || 0,
     description: form.elements["description"].value.trim(),
+    specs: readSpecInputs(),
   };
   const images = readImageInputs();
   if (!values.name) {
