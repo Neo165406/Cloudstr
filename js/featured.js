@@ -51,7 +51,7 @@ function renderHeroBanners(trackId) {
   if (carousel) carousel.style.display = "";
 
   el.innerHTML = banners
-    .map((b) => `<div class="hero-slide"><img src="${b.image}" alt="${b.alt || ""}" loading="eager" decoding="async"></div>`)
+    .map((b, i) => `<div class="hero-slide"><img src="${b.image}" alt="${b.alt || ""}" loading="${i === 0 ? "eager" : "lazy"}" decoding="async"><div class="hero-copy"><span class="hero-eyebrow">CLOUDSTR / SELECTED COLLECTION</span><h1>MAKE YOUR<br><em>OWN STATEMENT.</em></h1><a class="hero-cta" href="shop.html">EXPLORE COLLECTION <span aria-hidden="true">↗</span></a></div><span class="hero-index">0${i + 1} <i>/ 0${banners.length}</i></span></div>` )
     .join("");
 
   let dots = carousel.querySelector(".hero-dots");
