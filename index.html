@@ -167,6 +167,11 @@
         <div class="models-collage" id="models-collage"></div>
       </div>
 
+      <section class="reels-section reveal" id="reels-section" hidden aria-label="Short videos">
+        <div class="section-strip"><h2>Reels</h2><span class="reels-subtitle">Short videos</span></div>
+        <div class="reels-track" id="reels-track"></div>
+      </section>
+
       <div id="category-rows"></div>
     </div>
   </main>
@@ -256,12 +261,39 @@
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>
+    function renderCloudstrReels() {
+      const section = document.getElementById("reels-section");
+      const track = document.getElementById("reels-track");
+      if (!section || !track) return;
+      let reels = [];
+      try { const stored = JSON.parse(localStorage.getItem("cloudstr_home_reels") || "[]"); if (Array.isArray(stored)) reels = stored; } catch (error) {}
+      if (!reels.length) { section.hidden = true; return; }
+      track.innerHTML = reels.map((reel) => {
+        const title = String(reel.title || "Short video").replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+        let media = "";
+        if (reel.type === "instagram") {
+          const match = String(reel.url || "").match(/instagram\.com\/(?:reel|reels|p)\/([A-Za-z0-9_-]+)/);
+          if (!match) return "";
+          media = '<iframe src="https://www.instagram.com/reel/' + match[1] + '/embed/" title="' + title + '" loading="lazy" allowfullscreen></iframe>';
+        } else {
+          let safeUrl = "";
+          try { const parsed = new URL(reel.url); if ((parsed.protocol === "https:" || parsed.protocol === "http:") && /\.(mp4|webm|ogg)$/i.test(parsed.pathname)) safeUrl = parsed.href; } catch (error) {}
+          if (!safeUrl) return "";
+          media = '<video src="' + safeUrl.replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '" controls muted playsinline loop preload="metadata"></video>';
+        }
+        return '<article class="reel-card"><div class="reel-media">' + media + '</div><h3>' + title + '</h3></article>';
+      }).join("");
+      section.hidden = !track.children.length;
+    }
+  </script>
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("new-arrivals-grid").innerHTML = getNewArrivals(4).map(renderProductCard).join("");
       renderHeroBanners("hero-track");
       renderNewsTicker("news-ticker");
       renderBestSlider("best-track");
       renderModelsCollage("models-collage");
+      renderCloudstrReels();
 
       const order = ["coils-cartridges", "pod-devices", "podmod-devices", "nic-salts", "freebase-eliquid"];
       document.getElementById("category-rows").innerHTML = order.map(renderCategoryRow).join("");
