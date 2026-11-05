@@ -21,7 +21,6 @@
         <a href="#best-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Best Slider</a>
         <a href="#models-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Models</a>
         <a href="#reels-panel">Reels</a>
-        <a href="#decor-panel">Background Decor</a>
         <a href="#imgbb-panel">ImgBB Upload</a>
         <a href="#orders-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>Orders</a>
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>View Storefront</a>
@@ -90,28 +89,6 @@
           <p style="color:var(--muted);font-size:.78rem;margin:.7rem 0;">Use a public Instagram Reel link or a direct .mp4 video URL. Add only content suitable for the site's age-restricted audience.</p>
           <div style="overflow-x:auto;margin-top:1rem;"><table class="admin-table"><thead><tr><th>Title</th><th>Video URL</th><th>Actions</th></tr></thead><tbody id="admin-reels-body"></tbody></table></div>
         </div>
-      </div>
-
-      <div class="admin-panel" id="decor-panel">
-        <div class="admin-panel-head"><h3>Background product decor</h3><span style="font-size:.78rem;color:var(--muted);">Transparent PNG/WebP works best</span></div>
-        <div style="padding:1rem;"><form id="decor-form">
-          <div class="form-row-2">
-            <div class="form-group"><label for="decor-image-url">Image URL</label><input id="decor-image-url" type="url" placeholder="https://.../transparent-product.png"></div>
-            <div class="form-group"><label for="decor-image-file">Or choose transparent image</label><input id="decor-image-file" type="file" accept="image/*"></div>
-          </div>
-          <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin:.4rem 0 1rem;"><button class="btn btn-ghost" type="button" id="decor-upload-btn">Upload with ImgBB</button><span id="decor-upload-status" style="color:var(--muted);font-size:.78rem;"></span></div>
-          <div class="form-row-2">
-            <div class="form-group"><label for="decor-x">Horizontal position (%)</label><input id="decor-x" type="number" min="0" max="100" value="8" required></div>
-            <div class="form-group"><label for="decor-y">Vertical position (%)</label><input id="decor-y" type="number" min="0" max="100" value="22" required></div>
-            <div class="form-group"><label for="decor-width">Image width (px)</label><input id="decor-width" type="number" min="40" max="700" value="180" required></div>
-            <div class="form-group"><label for="decor-opacity">Opacity (%)</label><input id="decor-opacity" type="number" min="5" max="100" value="85" required></div>
-            <div class="form-group"><label for="decor-rotation">Rotation (degrees)</label><input id="decor-rotation" type="number" min="-180" max="180" value="-12" required></div>
-            <div class="form-group"><label for="decor-layer">Layer</label><select id="decor-layer"><option value="back">Behind content</option><option value="front">Above background</option></select></div>
-          </div>
-          <button class="btn btn-primary" type="submit" id="decor-submit">Add decor image</button> <button class="btn btn-ghost" type="button" id="decor-cancel" hidden>Cancel edit</button>
-        </form>
-        <p style="color:var(--muted);font-size:.78rem;margin:.8rem 0;">Use background-removed transparent PNG/WebP product cutouts. Set position, size, opacity and rotation. Multiple images are supported; decor never blocks clicks.</p>
-        <div style="overflow-x:auto;margin-top:1rem;"><table class="admin-table"><thead><tr><th>Preview</th><th>Position / size</th><th>Layer</th><th>Actions</th></tr></thead><tbody id="admin-decor-body"></tbody></table></div></div>
       </div>
 
       <div class="admin-panel" id="imgbb-panel">
