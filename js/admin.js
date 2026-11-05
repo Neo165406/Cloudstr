@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindFeaturedUI();
   bindHeroUI();
   bindImageResizer();
+  bindImgBBUI();
   document.getElementById("add-image-btn")?.addEventListener("click", () => addImageInput());
 });
 
@@ -218,6 +219,139 @@ function bindHeroUI() {
   });
 }
 
+const IMGBB_KEY_STORAGE = "cloudstr_imgbb_api_key";
+
+function getImgBBApiKey() {
+  try { return localStorage.getItem(IMGBB_KEY_STORAGE) || ""; }
+  catch (error) { return ""; }
+}
+
+async function uploadImageToImgBB(file) {
+  const apiKey = getImgBBApiKey();
+  if (!apiKey) throw new Error("Add and save your ImgBB API key in the ImgBB Upload panel first.");
+  if (!file || !file.type.startsWith("image/")) throw new Error("Choose a valid image file.");
+  if (file.size > 32 * 1024 * 1024) throw new Error("Image is larger than ImgBB's 32 MB upload limit.");
+
+  const body = new FormData();
+  body.append("image", file);
+  body.append("name", file.name.replace(/\\.[^.]+$/, "") || "cloudstr-image");
+
+  const endpoint = "https://api.imgbb.com/1/upload?key=" + encodeURIComponent(apiKey);
+  const response = await fetch(endpoint, { method: "POST", body });
+  let result;
+  try { result = await response.json(); }
+  catch (error) { throw new Error("ImgBB returned an unreadable response. Check your API key and connection."); }
+
+  if (!response.ok || !result.success || !result.data || !result.data.url) {
+    throw new Error(result?.error?.message || "ImgBB upload failed. Check your API key and try again.");
+  }
+  return result.data.url;
+}
+
+function bindImgBBUploadControl(fileId, buttonId, urlId, statusId) {
+  const fileInput = document.getElementById(fileId);
+  const button = document.getElementById(buttonId);
+  const urlInput = document.getElementById(urlId);
+  const status = document.getElementById(statusId);
+  if (!fileInput || !button || !urlInput) return;
+
+  button.addEventListener("click", async () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) {
+      if (status) status.textContent = "Choose an image first.";
+      return;
+    }
+    button.disabled = true;
+    const oldLabel = button.textContent;
+    button.textContent = "Uploading…";
+    if (status) status.textContent = "Uploading to ImgBB…";
+    try {
+      const url = await uploadImageToImgBB(file);
+      urlInput.value = url;
+      urlInput.dispatchEvent(new Event("input", { bubbles: true }));
+      if (status) status.textContent = "Upload complete.";
+      showToast("Image uploaded to ImgBB");
+    } catch (error) {
+      if (status) status.textContent = error.message;
+      showToast(error.message, "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
+  });
+}
+
+function bindImgBBUI() {
+  const keyInput = document.getElementById("imgbb-api-key");
+  const saveButton = document.getElementById("imgbb-save-key");
+  const clearButton = document.getElementById("imgbb-clear-key");
+  const keyStatus = document.getElementById("imgbb-key-status");
+
+  if (keyInput && saveButton && clearButton) {
+    const savedKey = getImgBBApiKey();
+    keyInput.value = savedKey;
+    if (keyStatus) keyStatus.textContent = savedKey ? "API key saved on this device." : "No API key saved.";
+
+    saveButton.addEventListener("click", () => {
+      const key = keyInput.value.trim();
+      if (!key) {
+        if (keyStatus) keyStatus.textContent = "Paste an API key first.";
+        return;
+      }
+      try {
+        localStorage.setItem(IMGBB_KEY_STORAGE, key);
+        if (keyStatus) keyStatus.textContent = "API key saved on this device.";
+        showToast("ImgBB API key saved");
+      } catch (error) {
+        if (keyStatus) keyStatus.textContent = "Could not save the key in this browser.";
+        showToast("Could not save the ImgBB API key", "error");
+      }
+    });
+
+    clearButton.addEventListener("click", () => {
+      try { localStorage.removeItem(IMGBB_KEY_STORAGE); } catch (error) {}
+      keyInput.value = "";
+      if (keyStatus) keyStatus.textContent = "API key cleared from this device.";
+      showToast("ImgBB API key cleared");
+    });
+  }
+
+  bindImgBBUploadControl("m-image-file", "m-image-upload", "m-image", "m-image-upload-status");
+  bindImgBBUploadControl("h-image-file", "h-image-upload", "h-image", "h-image-upload-status");
+
+  const holder = document.getElementById("image-inputs");
+  holder?.addEventListener("click", async (event) => {
+    const button = event.target.closest(".imgbb-upload-btn");
+    if (!button) return;
+    const row = button.closest(".image-input-row");
+    const fileInput = row?.querySelector(".imgbb-file-input");
+    const urlInput = row?.querySelector(".product-image-input");
+    const status = row?.querySelector(".imgbb-upload-status");
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      if (status) status.textContent = "Choose an image first.";
+      return;
+    }
+    button.disabled = true;
+    const oldLabel = button.textContent;
+    button.textContent = "Uploading…";
+    if (status) status.textContent = "Uploading…";
+    try {
+      const url = await uploadImageToImgBB(file);
+      urlInput.value = url;
+      urlInput.dispatchEvent(new Event("input", { bubbles: true }));
+      if (status) status.textContent = "Uploaded";
+      showToast("Product image uploaded to ImgBB");
+    } catch (error) {
+      if (status) status.textContent = error.message;
+      showToast(error.message, "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = oldLabel;
+    }
+  });
+}
+
 /* ---------------------------------------------------------------
    Product image inputs (multiple images)
 --------------------------------------------------------------- */
@@ -228,11 +362,26 @@ function addImageInput(value = "") {
   if (!holder) return;
   const row = document.createElement("div");
   row.className = "image-input-row";
+  row.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:.5rem 0;";
   const input = document.createElement("input");
   input.type = "url";
   input.className = "product-image-input";
   input.placeholder = "https://...";
   input.value = value;
+  input.style.cssText = "flex:1 1 190px;min-width:0;";
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  fileInput.className = "imgbb-file-input";
+  fileInput.setAttribute("aria-label", "Choose image to upload to ImgBB");
+  fileInput.style.cssText = "flex:1 1 145px;min-width:0;font-size:.72rem;";
+  const upload = document.createElement("button");
+  upload.type = "button";
+  upload.className = "btn btn-sm btn-ghost imgbb-upload-btn";
+  upload.textContent = "Upload";
+  const status = document.createElement("span");
+  status.className = "imgbb-upload-status";
+  status.style.cssText = "font-size:.7rem;color:var(--muted);flex:1 0 100%;";
   const remove = document.createElement("button");
   remove.type = "button";
   remove.className = "image-remove-btn";
@@ -243,7 +392,10 @@ function addImageInput(value = "") {
     if (!holder.querySelector(".image-input-row")) addImageInput();
   });
   row.appendChild(input);
+  row.appendChild(fileInput);
+  row.appendChild(upload);
   row.appendChild(remove);
+  row.appendChild(status);
   holder.appendChild(row);
 }
 
