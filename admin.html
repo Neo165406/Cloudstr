@@ -20,6 +20,7 @@
         <a href="#products-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/></svg>Products</a>
         <a href="#best-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Best Slider</a>
         <a href="#models-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Models</a>
+        <a href="#reels-panel">Reels</a>
         <a href="#imgbb-panel">ImgBB Upload</a>
         <a href="#orders-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>Orders</a>
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>View Storefront</a>
@@ -72,6 +73,22 @@
           <thead><tr><th>Photo</th><th>Name</th><th>Caption</th><th>Actions</th></tr></thead>
           <tbody id="admin-models-body"></tbody>
         </table>
+      </div>
+
+      <div class="admin-panel" id="reels-panel">
+        <div class="admin-panel-head"><h3>Homepage Reels</h3><span style="font-size:.78rem;color:var(--muted);">Add Instagram Reel or public MP4 links</span></div>
+        <div style="padding:1rem;">
+          <form id="reel-form">
+            <div class="form-row-2">
+              <div class="form-group"><label for="reel-title">Caption / title</label><input id="reel-title" maxlength="90" placeholder="Short video title" required></div>
+              <div class="form-group"><label for="reel-url">Instagram Reel or MP4 URL</label><input id="reel-url" type="url" placeholder="https://..." required></div>
+            </div>
+            <button class="btn btn-primary" type="submit" id="reel-submit">Add reel</button>
+            <button class="btn btn-ghost" type="button" id="reel-cancel" hidden>Cancel edit</button>
+          </form>
+          <p style="color:var(--muted);font-size:.78rem;margin:.7rem 0;">Use a public Instagram Reel link or a direct .mp4 video URL. Add only content suitable for the site's age-restricted audience.</p>
+          <div style="overflow-x:auto;margin-top:1rem;"><table class="admin-table"><thead><tr><th>Title</th><th>Video URL</th><th>Actions</th></tr></thead><tbody id="admin-reels-body"></tbody></table></div>
+        </div>
       </div>
 
       <div class="admin-panel" id="imgbb-panel">
