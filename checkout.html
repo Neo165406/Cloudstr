@@ -233,7 +233,7 @@
   <script>
     function renderCheckout() {
       const root = document.getElementById("checkout-root");
-      const { lines, subtotal, shipping, total } = getCartDetails();
+      const { lines, subtotal } = getCartDetails();
 
       if (!lines.length) {
         root.innerHTML = `<div class="empty-state">
@@ -269,10 +269,25 @@
           <aside class="summary-card">
             <h3 style="margin-bottom:1rem;">Order Summary</h3>
             ${lines.map((l) => `<div class="summary-row"><span class="muted">${l.product.name} × ${l.qty}</span><span>${formatPrice(l.lineTotal)}</span></div>`).join("")}
-            <div class="summary-row"><span class="muted">Shipping</span><span>${shipping === 0 ? "Free" : formatPrice(shipping)}</span></div>
-            <div class="summary-row total"><span>Total</span><span>${formatPrice(total)}</span></div>
+            <div class="summary-row"><span class="muted">Delivery charge</span><span id="checkout-shipping">Enter city</span></div>
+            <div class="summary-row total"><span>Total</span><span id="checkout-total">${formatPrice(subtotal)}</span></div>
           </aside>
         </div>`;
+
+      const cityInput = document.getElementById("c-city");
+      const shippingOutput = document.getElementById("checkout-shipping");
+      const totalOutput = document.getElementById("checkout-total");
+      cityInput.addEventListener("input", () => {
+        const city = cityInput.value.trim();
+        if (!city) {
+          shippingOutput.textContent = "Enter city";
+          totalOutput.textContent = formatPrice(subtotal);
+          return;
+        }
+        const quote = getCartDetails(city);
+        shippingOutput.textContent = formatPrice(quote.shipping);
+        totalOutput.textContent = formatPrice(quote.total);
+      });
 
       document.getElementById("checkout-form").addEventListener("submit", (e) => {
         e.preventDefault();
