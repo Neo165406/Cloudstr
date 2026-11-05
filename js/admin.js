@@ -57,8 +57,78 @@ document.addEventListener("DOMContentLoaded", () => {
   bindHeroUI();
   bindImageResizer();
   bindImgBBUI();
+  bindReelsAdmin();
   document.getElementById("add-image-btn")?.addEventListener("click", () => addImageInput());
 });
+
+const CLOUDSTR_REELS_KEY = "cloudstr_home_reels";
+let editingReelId = null;
+function readCloudstrReels() {
+  try { const value = JSON.parse(localStorage.getItem(CLOUDSTR_REELS_KEY) || "[]"); return Array.isArray(value) ? value : []; }
+  catch (error) { return []; }
+}
+function saveCloudstrReels(reels) {
+  try { localStorage.setItem(CLOUDSTR_REELS_KEY, JSON.stringify(reels)); return true; }
+  catch (error) { showToast("Could not save reels in this browser.", "error"); return false; }
+}
+function normalizeReelUrl(raw) {
+  try {
+    const url = new URL(raw.trim());
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    if (/(^|\.)instagram\.com$/i.test(url.hostname)) {
+      const match = url.pathname.match(/^\/(?:reel|reels|p)\/([A-Za-z0-9_-]+)/);
+      return match ? { type: "instagram", url: "https://www.instagram.com/reel/" + match[1] + "/" } : null;
+    }
+    if (/\.(mp4|webm|ogg)$/i.test(url.pathname)) return { type: "video", url: url.href };
+    return null;
+  } catch (error) { return null; }
+}
+function renderAdminReels() {
+  const body = document.getElementById("admin-reels-body");
+  if (!body) return;
+  const reels = readCloudstrReels();
+  body.innerHTML = reels.length ? reels.map((reel) => `<tr><td>${escapeHtml(reel.title)}</td><td style="max-width:260px;overflow-wrap:anywhere;">${escapeHtml(reel.url)}</td><td><button type="button" class="btn btn-sm btn-ghost" data-reel-edit="${reel.id}">Edit</button> <button type="button" class="btn btn-sm btn-ghost" data-reel-delete="${reel.id}">Delete</button></td></tr>`).join("") : '<tr><td colspan="3" style="color:var(--muted);">No reels added yet.</td></tr>';
+}
+function bindReelsAdmin() {
+  const form = document.getElementById("reel-form");
+  if (!form) return;
+  const title = document.getElementById("reel-title");
+  const url = document.getElementById("reel-url");
+  const submit = document.getElementById("reel-submit");
+  const cancel = document.getElementById("reel-cancel");
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const caption = title.value.trim();
+    const parsed = normalizeReelUrl(url.value);
+    if (!caption || !parsed) { showToast("Enter a title and a valid Instagram Reel or direct MP4 URL.", "error"); return; }
+    const reels = readCloudstrReels();
+    if (editingReelId) {
+      const item = reels.find((entry) => entry.id === editingReelId);
+      if (item) Object.assign(item, { title: caption, ...parsed });
+    } else reels.unshift({ id: "reel-" + Date.now(), title: caption, ...parsed });
+    if (!saveCloudstrReels(reels)) return;
+    form.reset(); editingReelId = null; submit.textContent = "Add reel"; cancel.hidden = true;
+    renderAdminReels(); showToast("Reel saved.");
+  });
+  cancel.addEventListener("click", () => { editingReelId = null; form.reset(); submit.textContent = "Add reel"; cancel.hidden = true; });
+  document.getElementById("admin-reels-body")?.addEventListener("click", (event) => {
+    const edit = event.target.closest("[data-reel-edit]");
+    const remove = event.target.closest("[data-reel-delete]");
+    const reels = readCloudstrReels();
+    if (edit) {
+      const item = reels.find((entry) => entry.id === edit.dataset.reelEdit);
+      if (!item) return;
+      editingReelId = item.id; title.value = item.title; url.value = item.url;
+      submit.textContent = "Save changes"; cancel.hidden = false; form.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    if (remove) {
+      if (!confirm("Delete this reel?")) return;
+      saveCloudstrReels(reels.filter((entry) => entry.id !== remove.dataset.reelDelete));
+      renderAdminReels(); showToast("Reel deleted.");
+    }
+  });
+  renderAdminReels();
+}
 
 function setText(id, value) {
   const el = document.getElementById(id);
