@@ -262,6 +262,26 @@
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
   <script>
+
+    function renderBackgroundDecor() {
+      const layer = document.getElementById("background-decor-layer");
+      if (!layer) return;
+      let items = [];
+      try { const saved = JSON.parse(localStorage.getItem("cloudstr_background_decor") || "[]"); if (Array.isArray(saved)) items = saved; } catch (error) {}
+      layer.innerHTML = items.map((item) => {
+        let url = "";
+        try { const parsed = new URL(item.url); if (parsed.protocol === "https:" || parsed.protocol === "http:") url = parsed.href; } catch (error) {}
+        if (!url) return "";
+        const x = Math.max(0, Math.min(100, Number(item.x) || 0));
+        const y = Math.max(0, Math.min(100, Number(item.y) || 0));
+        const width = Math.max(40, Math.min(700, Number(item.width) || 180));
+        const opacity = Math.max(5, Math.min(100, Number(item.opacity) || 85));
+        const rotation = Math.max(-180, Math.min(180, Number(item.rotation) || 0));
+        const safe = url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+        return '<img class="background-decor-item" src="' + safe + '" alt="" loading="lazy" style="left:' + x + '%;top:' + y + '%;width:' + width + 'px;opacity:' + opacity/100 + ';transform:rotate(' + rotation + 'deg)">';
+      }).join("");
+    }
+
     function renderCloudstrReels() {
       const section = document.getElementById("reels-section");
       const track = document.getElementById("reels-track");
@@ -295,6 +315,7 @@
       renderBestSlider("best-track");
       renderModelsCollage("models-collage");
       renderCloudstrReels();
+      renderBackgroundDecor();
 
       const order = ["coils-cartridges", "pod-devices", "podmod-devices", "nic-salts", "freebase-eliquid"];
       document.getElementById("category-rows").innerHTML = order.map(renderCategoryRow).join("");
