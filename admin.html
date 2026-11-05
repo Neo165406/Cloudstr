@@ -20,6 +20,7 @@
         <a href="#products-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7L12 3 4 7v10l8 4 8-4z"/></svg>Products</a>
         <a href="#best-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>Best Slider</a>
         <a href="#models-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Models</a>
+        <a href="#imgbb-panel">ImgBB Upload</a>
         <a href="#orders-panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/></svg>Orders</a>
         <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>View Storefront</a>
       </nav>
@@ -71,6 +72,20 @@
           <thead><tr><th>Photo</th><th>Name</th><th>Caption</th><th>Actions</th></tr></thead>
           <tbody id="admin-models-body"></tbody>
         </table>
+      </div>
+
+      <div class="admin-panel" id="imgbb-panel">
+        <div class="admin-panel-head"><h3>ImgBB image uploads</h3><span style="font-size:0.78rem;color:var(--muted);">Upload and get a direct image URL</span></div>
+        <div style="padding:1rem;">
+          <p style="color:var(--muted);font-size:.86rem;margin:0 0 1rem;">Add your ImgBB API key once. Product, banner, and model image fields will then let you choose a file and upload it directly to ImgBB. The returned URL is inserted into the image field automatically.</p>
+          <div class="form-group"><label for="imgbb-api-key">ImgBB API key</label><input id="imgbb-api-key" type="password" autocomplete="off" placeholder="Paste your ImgBB API key"></div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+            <button type="button" class="btn btn-primary" id="imgbb-save-key">Save API key on this device</button>
+            <button type="button" class="btn btn-ghost" id="imgbb-clear-key">Clear key</button>
+            <span id="imgbb-key-status" style="font-size:.8rem;color:var(--muted);">No API key saved.</span>
+          </div>
+          <p style="color:var(--muted);font-size:.75rem;margin:.9rem 0 0;">Security note: this static admin stores the key in this browser's local storage. Anyone using this browser/admin page can access it. Use only your ImgBB client API key, not a private server secret. Images uploaded to ImgBB are public.</p>
+        </div>
       </div>
 
       <div class="admin-panel" id="image-resizer-panel">
@@ -157,7 +172,9 @@
       </div>
       <form id="model-form">
         <div class="form-group"><label for="m-name">Name</label><input type="text" id="m-name" name="name" required placeholder="e.g. Studio Look 1"></div>
-        <div class="form-group"><label for="m-image">Image URL</label><input type="url" id="m-image" name="image" required placeholder="https://..."></div>
+        <div class="form-group"><label for="m-image">Image URL</label><input type="url" id="m-image" name="image" required placeholder="https://...">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;"><input type="file" id="m-image-file" accept="image/*" style="max-width:100%;font-size:.78rem;"><button type="button" class="btn btn-sm btn-ghost" id="m-image-upload">Upload to ImgBB</button><span id="m-image-upload-status" style="font-size:.75rem;color:var(--muted);"></span></div>
+        </div>
         <div class="form-group"><label for="m-caption">Caption</label><input type="text" id="m-caption" name="caption" placeholder="Short caption"></div>
         <button type="submit" class="btn btn-primary btn-block">Save photo</button>
       </form>
@@ -170,7 +187,9 @@
         <button class="modal-close" id="hero-modal-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
       </div>
       <form id="hero-form">
-        <div class="form-group"><label for="h-image">Image URL</label><input type="url" id="h-image" name="image" required placeholder="https://..."></div>
+        <div class="form-group"><label for="h-image">Image URL</label><input type="url" id="h-image" name="image" required placeholder="https://...">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.5rem;"><input type="file" id="h-image-file" accept="image/*" style="max-width:100%;font-size:.78rem;"><button type="button" class="btn btn-sm btn-ghost" id="h-image-upload">Upload to ImgBB</button><span id="h-image-upload-status" style="font-size:.75rem;color:var(--muted);"></span></div>
+        </div>
         <div class="form-group"><label for="h-alt">Alt text</label><input type="text" id="h-alt" name="alt" placeholder="Short description of the photo"></div>
         <button type="submit" class="btn btn-primary btn-block">Save banner</button>
       </form>
