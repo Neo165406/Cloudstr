@@ -234,7 +234,7 @@ async function uploadImageToImgBB(file) {
 
   const body = new FormData();
   body.append("image", file);
-  body.append("name", file.name.replace(/\\.[^.]+$/, "") || "cloudstr-image");
+  body.append("name", file.name.replace(/\.[^.]+$/, "") || "cloudstr-image");
 
   const endpoint = "https://api.imgbb.com/1/upload?key=" + encodeURIComponent(apiKey);
   const response = await fetch(endpoint, { method: "POST", body });
