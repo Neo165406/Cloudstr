@@ -881,3 +881,80 @@ input:focus, select:focus, textarea:focus {
 @media (prefers-reduced-motion: reduce) {
   .hero-slide img, .hero-cta { transition: none !important; }
 }
+
+
+/* Product card refinement: compact action + room for key specs */
+.product-grid .product-info,
+.best-track .product-info {
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+.product-grid .product-specs,
+.best-track .product-specs {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  width: 100%;
+  margin: 0;
+  padding: 8px 0 9px;
+  border-top: 1px solid rgba(255,255,255,.09);
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+.product-grid .product-specs li,
+.best-track .product-specs li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  font-size: .68rem;
+  line-height: 1.35;
+}
+.product-grid .product-specs li span,
+.best-track .product-specs li span {
+  color: var(--muted);
+  min-width: 0;
+}
+.product-grid .product-specs li strong,
+.best-track .product-specs li strong {
+  color: #e8eee6;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.product-grid .product-price-row,
+.best-track .product-price-row {
+  width: 100%;
+  margin-top: auto;
+}
+.product-grid .product-cta,
+.best-track .product-cta {
+  width: auto !important;
+  min-width: 112px;
+  min-height: 34px !important;
+  align-self: flex-start !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px !important;
+  border-radius: 5px !important;
+  white-space: nowrap;
+  font-size: .7rem !important;
+}
+@media (max-width: 620px) {
+  .product-grid .product-info,
+  .best-track .product-info { gap: 7px !important; }
+  .product-grid .product-specs,
+  .best-track .product-specs { gap: 4px; padding: 7px 0; }
+  .product-grid .product-specs li,
+  .best-track .product-specs li { font-size: .61rem; }
+  .product-grid .product-cta,
+  .best-track .product-cta {
+    min-width: 98px;
+    min-height: 32px !important;
+    padding: 7px 9px !important;
+    font-size: .65rem !important;
+  }
+}
