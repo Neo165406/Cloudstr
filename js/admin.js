@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   bindAdminUI();
   bindFeaturedUI();
   bindHeroUI();
+  bindImageResizer();
   document.getElementById("add-image-btn")?.addEventListener("click", () => addImageInput());
 });
 
@@ -500,4 +501,143 @@ function iconEdit() {
 }
 function iconTrash() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
+}
+
+
+/* ---------------------------------------------------------------
+   Local image resizer — preserves the source aspect ratio.
+   Files are processed in-browser and are never uploaded.
+--------------------------------------------------------------- */
+function bindImageResizer() {
+  const fileInput = document.getElementById("resizer-file");
+  const widthInput = document.getElementById("resizer-width");
+  const heightInput = document.getElementById("resizer-height");
+  const formatInput = document.getElementById("resizer-format");
+  const qualityInput = document.getElementById("resizer-quality");
+  const qualityValue = document.getElementById("resizer-quality-value");
+  const info = document.getElementById("resizer-info");
+  const originalPreview = document.getElementById("resizer-original-preview");
+  const outputPreview = document.getElementById("resizer-output-preview");
+  const downloadButton = document.getElementById("resizer-download");
+  if (!fileInput || !downloadButton) return;
+
+  let sourceImage = null;
+  let sourceUrl = "";
+  let outputUrl = "";
+  let outputBlob = null;
+  let outputName = "cloudstr-resized.webp";
+  let renderToken = 0;
+
+  function clearOutput() {
+    outputBlob = null;
+    downloadButton.disabled = true;
+    outputPreview.style.display = "none";
+    outputPreview.removeAttribute("src");
+    if (outputUrl) URL.revokeObjectURL(outputUrl);
+    outputUrl = "";
+  }
+
+  async function renderResizedImage() {
+    const token = ++renderToken;
+    clearOutput();
+    if (!sourceImage) return;
+
+    const maxWidth = Math.max(1, Math.min(12000, Number(widthInput.value) || 1200));
+    const maxHeight = Math.max(1, Math.min(12000, Number(heightInput.value) || 1200));
+    const scale = Math.min(maxWidth / sourceImage.naturalWidth, maxHeight / sourceImage.naturalHeight, 1);
+    const width = Math.max(1, Math.round(sourceImage.naturalWidth * scale));
+    const height = Math.max(1, Math.round(sourceImage.naturalHeight * scale));
+    const format = formatInput.value;
+    const quality = Math.max(0.4, Math.min(1, (Number(qualityInput.value) || 85) / 100));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      info.textContent = "Your browser could not create an image canvas.";
+      return;
+    }
+    if (format === "image/jpeg") {
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, width, height);
+    }
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(sourceImage, 0, 0, width, height);
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, format, quality));
+    if (token !== renderToken) return;
+    if (!blob) {
+      info.textContent = "Could not process this image. Try another format.";
+      return;
+    }
+    outputBlob = blob;
+    outputUrl = URL.createObjectURL(blob);
+    outputPreview.src = outputUrl;
+    outputPreview.style.display = "block";
+    const extension = blob.type === "image/jpeg" ? "jpg" : blob.type === "image/png" ? "png" : "webp";
+    outputName = (fileInput.files[0]?.name || "image").replace(/\\.[^.]+$/, "") + "-resized." + extension;
+    const originalSize = fileInput.files[0]?.size || 0;
+    const saved = originalSize ? Math.round((1 - blob.size / originalSize) * 100) : 0;
+    info.textContent = sourceImage.naturalWidth + " × " + sourceImage.naturalHeight + " → " + width + " × " + height +
+      " px · " + (blob.size / 1024).toFixed(1) + " KB" +
+      (originalSize ? " · " + (saved >= 0 ? saved + "% smaller" : Math.abs(saved) + "% larger") : "");
+    downloadButton.disabled = false;
+  }
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files && fileInput.files[0];
+    sourceImage = null;
+    clearOutput();
+    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+    sourceUrl = "";
+    if (!file) {
+      originalPreview.style.display = "none";
+      info.textContent = "No image selected.";
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      info.textContent = "Please choose a valid image file.";
+      fileInput.value = "";
+      return;
+    }
+    sourceUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      sourceImage = image;
+      originalPreview.src = sourceUrl;
+      originalPreview.style.display = "block";
+      info.textContent = "Original: " + image.naturalWidth + " × " + image.naturalHeight + " px";
+      renderResizedImage();
+    };
+    image.onerror = () => {
+      info.textContent = "This image could not be opened. Try another file.";
+    };
+    image.src = sourceUrl;
+  });
+
+  [widthInput, heightInput, formatInput, qualityInput].forEach((control) => {
+    control.addEventListener("input", () => {
+      qualityValue.textContent = qualityInput.value + "%";
+      if (sourceImage) renderResizedImage();
+    });
+    control.addEventListener("change", () => {
+      if (sourceImage) renderResizedImage();
+    });
+  });
+
+  downloadButton.addEventListener("click", () => {
+    if (!outputBlob || !outputUrl) return;
+    const link = document.createElement("a");
+    link.href = outputUrl;
+    link.download = outputName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+
+  window.addEventListener("beforeunload", () => {
+    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+    if (outputUrl) URL.revokeObjectURL(outputUrl);
+  });
 }
