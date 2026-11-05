@@ -66,7 +66,13 @@ function getCartCount() {
   return getCart().reduce((sum, item) => sum + item.qty, 0);
 }
 
-function getCartDetails() {
+function getShippingCharge(city = "") {
+  const normalizedCity = String(city).trim().toLowerCase();
+  if (!normalizedCity) return 0;
+  return normalizedCity.includes("dhaka") ? 70 : 130;
+}
+
+function getCartDetails(city = "") {
   const cart = getCart();
   const allProducts = getAllProducts();
   const lines = cart
@@ -77,7 +83,7 @@ function getCartDetails() {
     })
     .filter(Boolean);
   const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-  const shipping = subtotal > 0 ? (subtotal >= 3000 ? 0 : 80) : 0;
+  const shipping = subtotal > 0 ? getShippingCharge(city) : 0;
   const total = subtotal + shipping;
   return { lines, subtotal, shipping, total };
 }
@@ -117,7 +123,7 @@ function getOrders() {
 }
 
 function placeOrder(shipping) {
-  const { lines, subtotal, shipping: shippingCost, total } = getCartDetails();
+  const { lines, subtotal, shipping: shippingCost, total } = getCartDetails(shipping?.city || "");
   if (!lines.length) return null;
 
   const order = {
