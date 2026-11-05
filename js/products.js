@@ -302,6 +302,7 @@ function renderProductCard(p) {
       </div>
       <div class="product-info">
         <h3 class="product-name">${p.name}</h3>
+        ${p.specs && Object.keys(p.specs).length ? `<ul class="product-specs">${Object.entries(p.specs).slice(0, 3).map(([key, value]) => `<li><span>${key}</span><strong>${value}</strong></li>`).join("")}</ul>` : ""}
         <div class="product-price-row">
           <span class="product-price">${formatPrice(p.price)}</span>
           ${p.compareAt ? `<span class="product-price-strike">${formatPrice(p.compareAt)}</span>` : ""}
