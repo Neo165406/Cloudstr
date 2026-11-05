@@ -244,9 +244,11 @@
 
       const specsRows = Object.entries(product.specs).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")
         || `<tr><td colspan="2">No specifications listed.</td></tr>`;
-      const reviewsHtml = product.reviews.length
-        ? product.reviews.map((r) => `<div class="review-item"><div class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</div><p>${r.text}</p><div class="review-author">${r.author}</div></div>`).join("")
-        : `<p style="color:var(--muted);">No reviews yet for this product.</p>`;
+      const safeText = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[char]));
+      const renderReviews = () => (product.reviews || []).map((r) => {
+        const rating = Math.max(1, Math.min(5, Number(r.rating) || 5));
+        return `<div class="review-item"><div class="review-stars">${"★".repeat(rating)}${"☆".repeat(5-rating)}</div><p>${safeText(r.text)}</p><div class="review-author">${safeText(r.author || "Customer")}</div></div>`;
+      }).join("") || `<p style="color:var(--muted);">No reviews yet for this product.</p>`;
 
       root.innerHTML = `
         <div class="breadcrumbs"><a href="index.html">Home</a> / <a href="shop.html?category=${product.category}">${CATEGORY_LABELS[product.category]}</a> / <span>${product.name}</span></div>
@@ -288,7 +290,19 @@
               </div>
               <div class="tab-panel active" data-panel="desc"><p>${product.description}</p></div>
               <div class="tab-panel" data-panel="specs"><table class="spec-table">${specsRows}</table></div>
-              <div class="tab-panel" data-panel="reviews">${reviewsHtml}</div>
+              <div class="tab-panel" data-panel="reviews">
+                <div id="product-reviews-list">${renderReviews()}</div>
+                <form id="buyer-review-form" style="margin-top:1.25rem;padding:1rem;border:1px solid var(--border);border-radius:12px;">
+                  <h3 style="margin-bottom:.75rem;">Write a review</h3>
+                  <div class="form-row-2">
+                    <div class="form-group"><label for="buyer-review-name">Your name</label><input id="buyer-review-name" name="author" type="text" maxlength="50" required placeholder="Name"></div>
+                    <div class="form-group"><label for="buyer-review-rating">Rating</label><select id="buyer-review-rating" name="rating" required><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></div>
+                  </div>
+                  <div class="form-group"><label for="buyer-review-text">Review</label><textarea id="buyer-review-text" name="text" rows="3" maxlength="1000" required placeholder="Share your feedback"></textarea></div>
+                  <button class="btn btn-primary" type="submit">Submit review</button>
+                  <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem;">Prototype: reviews are saved only in this browser. A shared database is needed for all buyers to see them.</p>
+                </form>
+              </div>
             </div>
           </div>
         </div>`;
@@ -307,6 +321,25 @@
           btn.classList.add("active");
           document.querySelector(`.tab-panel[data-panel="${btn.dataset.tab}"]`).classList.add("active");
         });
+      });
+
+      document.getElementById("buyer-review-form")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const author = form.elements.author.value.trim();
+        const text = form.elements.text.value.trim();
+        const rating = Math.max(1, Math.min(5, Number(form.elements.rating.value) || 5));
+        if (!author || !text) return;
+        const catalog = loadProducts();
+        const item = catalog.find((entry) => entry.id === product.id);
+        if (!item) { showToast("Product data unavailable. Refresh and try again.", "error"); return; }
+        item.reviews = Array.isArray(item.reviews) ? item.reviews : [];
+        item.reviews.unshift({ id: "r" + Date.now(), author, text, rating, createdAt: new Date().toISOString() });
+        if (!saveProducts(catalog)) { showToast("Could not save review in this browser.", "error"); return; }
+        product.reviews = item.reviews;
+        document.getElementById("product-reviews-list").innerHTML = renderReviews();
+        form.reset();
+        showToast("Review saved.");
       });
 
       let qty = 1;
