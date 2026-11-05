@@ -58,30 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
   bindImageResizer();
   bindImgBBUI();
   bindReelsAdmin();
-  bindBackgroundDecorAdmin();
   document.getElementById("add-image-btn")?.addEventListener("click", () => addImageInput());
 });
 
-const CLOUDSTR_DECOR_KEY = "cloudstr_background_decor";
-let editingDecorId = null;
-function readBackgroundDecor() { try { const v=JSON.parse(localStorage.getItem(CLOUDSTR_DECOR_KEY)||"[]"); return Array.isArray(v)?v:[]; } catch(e) { return []; } }
-function saveBackgroundDecor(items) { try { localStorage.setItem(CLOUDSTR_DECOR_KEY,JSON.stringify(items)); return true; } catch(e) { showToast("Could not save decor in this browser.","error"); return false; } }
-function renderAdminDecor() {
-  const body=document.getElementById("admin-decor-body"); if(!body)return; const items=readBackgroundDecor();
-  body.innerHTML=items.length?items.map(item=>"<tr><td><img src=\""+escapeHtml(item.url)+"\" alt=\"\" style=\"width:58px;height:58px;object-fit:contain;background:#0d120f;border-radius:8px;\"></td><td>"+Number(item.x)+"% / "+Number(item.y)+"% · "+Number(item.width)+"px<br><small style=\"color:var(--muted);\">Opacity "+Number(item.opacity??85)+"% · Rotate "+Number(item.rotation||0)+"°</small></td><td>"+(item.layer==="front"?"Above background":"Behind content")+"</td><td><div class=\"row-actions\"><button type=\"button\" class=\"btn btn-sm btn-primary\" data-decor-edit=\""+escapeHtml(item.id)+"\">Edit decor</button><button type=\"button\" class=\"btn btn-sm btn-ghost\" data-decor-delete=\""+escapeHtml(item.id)+"\">Delete</button></div></td></tr>").join(""):"<tr><td colspan=\"4\" style=\"color:var(--muted);\">No background decor added yet. Add an image above to see Edit and Delete actions here.</td></tr>";
-}
-function bindBackgroundDecorAdmin() {
-  const form=document.getElementById("decor-form"); if(!form)return;
-  const get=id=>document.getElementById("decor-"+id), submit=get("submit"), cancel=get("cancel");
-  get("upload-btn").addEventListener("click",async()=>{ const file=get("image-file").files&&get("image-file").files[0], status=get("upload-status"); if(!file){status.textContent="Choose an image first.";return;} const btn=get("upload-btn");btn.disabled=true;status.textContent="Uploading…";try{get("image-url").value=await uploadImageToImgBB(file);status.textContent="Upload complete.";}catch(e){status.textContent=e.message;}finally{btn.disabled=false;} });
-  form.addEventListener("submit",event=>{ event.preventDefault(); let parsed;try{parsed=new URL(get("image-url").value.trim());}catch(e){} if(!parsed||!(parsed.protocol==="https:"||parsed.protocol==="http:")){showToast("Enter a valid image URL or upload an image first.","error");return;}
-    const item={id:editingDecorId||"decor-"+Date.now(),url:parsed.href,x:Math.max(0,Math.min(100,Number(get("x").value)||0)),y:Math.max(0,Math.min(100,Number(get("y").value)||0)),width:Math.max(40,Math.min(700,Number(get("width").value)||180)),opacity:Math.max(5,Math.min(100,Number(get("opacity").value)||85)),rotation:Math.max(-180,Math.min(180,Number(get("rotation").value)||0)),layer:get("layer").value==="front"?"front":"back"};
-    const items=readBackgroundDecor(),at=items.findIndex(v=>v.id===editingDecorId);if(at>=0)items[at]=item;else items.push(item);if(!saveBackgroundDecor(items))return;editingDecorId=null;form.reset();get("x").value=8;get("y").value=22;get("width").value=180;get("opacity").value=85;get("rotation").value=-12;get("layer").value="back";submit.textContent="Add decor image";cancel.hidden=true;renderAdminDecor();showToast("Background decor saved.");
-  });
-  cancel.addEventListener("click",()=>{editingDecorId=null;form.reset();submit.textContent="Add decor image";cancel.hidden=true;});
-  document.getElementById("admin-decor-body").addEventListener("click",event=>{const edit=event.target.closest("[data-decor-edit]"),del=event.target.closest("[data-decor-delete]"),items=readBackgroundDecor();if(edit){const v=items.find(row=>row.id===edit.dataset.decorEdit);if(!v)return;editingDecorId=v.id;get("image-url").value=v.url;["x","y","width","opacity","rotation","layer"].forEach(k=>get(k).value=v[k]);submit.textContent="Save changes";cancel.hidden=false;form.scrollIntoView({behavior:"smooth",block:"center"});}if(del&&confirm("Remove this background decor image?")){saveBackgroundDecor(items.filter(row=>row.id!==del.dataset.decorDelete));renderAdminDecor();showToast("Decor image removed.");}});
-  renderAdminDecor();
-}
 const CLOUDSTR_REELS_KEY = "cloudstr_home_reels";
 let editingReelId = null;
 function readCloudstrReels() {
