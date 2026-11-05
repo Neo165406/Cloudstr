@@ -1008,3 +1008,9 @@ input:focus, select:focus, textarea:focus {
     min-height: 155px !important;
   }
 }
+
+
+/* CLOUDSTR brand mark */
+.logo.logo-image { display:inline-flex; align-items:center; gap:0; width:clamp(150px, 19vw, 220px); }
+.logo.logo-image img { display:block; width:100%; height:auto; max-height:58px; object-fit:contain; }
+@media(max-width:520px){.logo.logo-image{width:clamp(116px, 34vw, 150px)}.logo.logo-image img{max-height:44px}}
