@@ -1074,3 +1074,7 @@ input:focus, select:focus, textarea:focus {
 .reel-card h3 { margin:.65rem .1rem 0; font-size:.88rem; font-weight:600; line-height:1.4; }
 @media(max-width:700px){.reels-track{grid-auto-columns:minmax(155px,42%);gap:.75rem}.reels-section{margin:1.8rem 0 2.2rem}}
 @media(prefers-reduced-motion:reduce){.reels-track{scroll-behavior:auto}}
+
+
+/* Transparent product cutouts as ambient homepage background decor */
+.storefront-main{position:relative;isolation:isolate;overflow:clip}.background-decor-layer{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}.background-decor-item{position:absolute;height:auto;max-width:min(55vw,700px);object-fit:contain;pointer-events:none;user-select:none;filter:drop-shadow(0 18px 28px rgba(0,0,0,.32))}.storefront-main>.wrap{position:relative;z-index:1}.background-decor-item.is-front{z-index:2}
