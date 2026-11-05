@@ -200,7 +200,7 @@ function renderBestSlider(containerId) {
   const wrap = el.closest(".best-slider-wrap");
   if (!products.length) { if (wrap) wrap.style.display = "none"; return; }
   if (wrap) wrap.style.display = "";
-  el.innerHTML = products.map(renderProductCard).join("") + products.map(renderProductCard).join("");
+  el.innerHTML = products.map(renderProductCard).join("");
 }
 
 function renderModelsCollage(containerId) {
