@@ -1060,3 +1060,17 @@ input:focus, select:focus, textarea:focus {
     font-size: .76rem !important;
   }
 }
+
+
+/* Homepage vertical reels strip */
+.reels-section { margin: 2.5rem 0 3rem; }
+.reels-section[hidden] { display:none !important; }
+.reels-section .section-strip { margin-bottom:1rem; }
+.reels-subtitle { color:var(--muted); font-size:.78rem; }
+.reels-track { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(190px, 22%); gap:1rem; overflow-x:auto; overscroll-behavior-inline:contain; scroll-snap-type:x mandatory; padding:0 0 .8rem; }
+.reel-card { min-width:0; scroll-snap-align:start; }
+.reel-media { width:100%; aspect-ratio:9/16; overflow:hidden; border:1px solid var(--border); border-radius:14px; background:#080b09; }
+.reel-media video,.reel-media iframe { display:block; width:100%; height:100%; border:0; object-fit:cover; }
+.reel-card h3 { margin:.65rem .1rem 0; font-size:.88rem; font-weight:600; line-height:1.4; }
+@media(max-width:700px){.reels-track{grid-auto-columns:minmax(155px,42%);gap:.75rem}.reels-section{margin:1.8rem 0 2.2rem}}
+@media(prefers-reduced-motion:reduce){.reels-track{scroll-behavior:auto}}
