@@ -83,7 +83,7 @@ function getCartDetails(city = "") {
     })
     .filter(Boolean);
   const subtotal = lines.reduce((sum, l) => sum + l.lineTotal, 0);
-  const shipping = subtotal > 0 ? getShippingCharge(city) : 0;
+  const shipping = subtotal > 0 ? (subtotal >= 2000 ? 0 : getShippingCharge(city)) : 0;
   const total = subtotal + shipping;
   return { lines, subtotal, shipping, total };
 }
