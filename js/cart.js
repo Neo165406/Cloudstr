@@ -69,7 +69,7 @@ function getCartCount() {
 function getShippingCharge(city = "") {
   const normalizedCity = String(city).trim().toLowerCase();
   if (!normalizedCity) return 0;
-  return normalizedCity.includes("dhaka") ? 70 : 130;
+  return (normalizedCity.includes("dhaka") || normalizedCity.includes("ঢাকা")) ? 70 : 130;
 }
 
 function getCartDetails(city = "") {
