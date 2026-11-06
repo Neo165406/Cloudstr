@@ -1,14 +1,7 @@
 /**
  * cloudStr — Product Data Layer
- * --------------------------------
- * Fictional catalog data + query helpers, modeled on a real
- * multi-category vape retailer's structure (disposables, nic salts,
- * pod devices, podmod devices, coils/cartridges, freebase e-liquid).
- *
- * SEED_PRODUCTS is the built-in catalog. Admin edits are saved to
- * localStorage (see saveProducts) and take priority over the seed on
- * every page load, so the storefront and admin share one catalog.
- * Swap the implementation for Firestore later without touching callers.
+ * Catalog source of truth: Firestore `products`.
+ * localStorage is only a cache so the first paint is not blank.
  */
 
 const CURRENCY = "৳";
@@ -22,33 +15,30 @@ const CATEGORY_LABELS = {
   "freebase-eliquid": "Freebase E-liquid",
 };
 
-const SEED_PRODUCTS = []; // No demo products are shipped with the storefront.
+const SEED_PRODUCTS = [];
 
-/* ---------------------------------------------------------------
-   Persistence (localStorage)
-   Admin edits are written with saveProducts(); every page loads the
-   saved catalog here, falling back to the seed on first run or if
-   storage is unavailable/corrupt.
---------------------------------------------------------------- */
 const PRODUCTS_STORAGE_KEY = "cloudstr_products";
+const PRODUCTS_COLLECTION = "products";
 
-function loadProducts() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(PRODUCTS_STORAGE_KEY));
-    if (Array.isArray(saved)) {
-      // Remove the original p1–p22 demo catalog from browsers that cached it.
-      // Preserve products added later through the admin dashboard.
-      const clean = saved.filter((product) => !/^p(?:[1-9]|1[0-9]|2[0-2])$/.test(String(product?.id || "")));
-      if (clean.length !== saved.length) {
-        localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(clean));
-      }
-      return clean;
-    }
-  } catch (e) {}
-  return SEED_PRODUCTS.slice();
+function cleanProductList(list) {
+  if (!Array.isArray(list)) return [];
+  return list.filter((product) => product && product.id && !/^p(?:[1-9]|1[0-9]|2[0-2])$/.test(String(product.id)));
 }
 
-function saveProducts(list) {
+function readLocalProducts() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCTS_STORAGE_KEY));
+    const clean = cleanProductList(saved);
+    if (Array.isArray(saved) && clean.length !== saved.length) {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(clean));
+    }
+    return clean;
+  } catch (e) {
+    return SEED_PRODUCTS.slice();
+  }
+}
+
+function writeLocalProducts(list) {
   try {
     localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(list));
     return true;
@@ -57,12 +47,94 @@ function saveProducts(list) {
   }
 }
 
-// The live catalog used by every helper below.
-const MOCK_PRODUCTS = loadProducts();
+function firestoreSafe(product) {
+  const copy = JSON.parse(JSON.stringify(product));
+  copy.id = String(copy.id);
+  return copy;
+}
 
-/* ---------------------------------------------------------------
-   Query helpers
---------------------------------------------------------------- */
+const MOCK_PRODUCTS = readLocalProducts();
+window.__cloudstrCatalogReady = false;
+window.cloudstrProductSync = Promise.resolve(true);
+
+function replaceCatalog(list, { persistLocal = true, notify = true } = {}) {
+  const next = cleanProductList(list);
+  MOCK_PRODUCTS.splice(0, MOCK_PRODUCTS.length, ...next);
+  if (persistLocal) writeLocalProducts(next);
+  window.__cloudstrCatalogReady = true;
+  if (notify) window.dispatchEvent(new CustomEvent("cloudstr-products-updated"));
+  return next;
+}
+
+async function syncProductsToFirestore(list) {
+  const ready = await (window.cloudstrFirestoreReady || Promise.resolve(false));
+  const db = window.CloudStrDB && window.CloudStrDB.db;
+  if (!ready || !db) return false;
+  const col = db.collection(PRODUCTS_COLLECTION);
+  const snap = await col.get();
+  const keep = new Set(list.map((product) => String(product.id)));
+  let batch = db.batch();
+  let ops = 0;
+  async function flush() {
+    if (!ops) return;
+    await batch.commit();
+    batch = db.batch();
+    ops = 0;
+  }
+  for (const doc of snap.docs) {
+    if (!keep.has(doc.id)) {
+      batch.delete(doc.ref);
+      ops += 1;
+      if (ops >= 400) await flush();
+    }
+  }
+  for (const product of list) {
+    batch.set(col.doc(String(product.id)), firestoreSafe(product));
+    ops += 1;
+    if (ops >= 400) await flush();
+  }
+  await flush();
+  return true;
+}
+
+function saveProducts(list) {
+  const saved = writeLocalProducts(cleanProductList(list));
+  if (!saved) return false;
+  replaceCatalog(list, { persistLocal: false, notify: false });
+  window.cloudstrProductSync = syncProductsToFirestore(MOCK_PRODUCTS.slice()).catch((err) => {
+    console.warn("[cloudStr] Firestore product sync failed:", err);
+    window.dispatchEvent(new CustomEvent("cloudstr-products-sync-error", { detail: err }));
+    return false;
+  });
+  return true;
+}
+
+function loadProducts() {
+  return MOCK_PRODUCTS.slice();
+}
+
+(async function hydrateProductsFromFirestore() {
+  try {
+    const ready = await (window.cloudstrFirestoreReady || Promise.resolve(false));
+    const db = window.CloudStrDB && window.CloudStrDB.db;
+    if (!ready || !db) {
+      window.__cloudstrCatalogReady = true;
+      return;
+    }
+    const snap = await db.collection(PRODUCTS_COLLECTION).get();
+    if (snap.empty) {
+      if (MOCK_PRODUCTS.length) await syncProductsToFirestore(MOCK_PRODUCTS.slice());
+      window.__cloudstrCatalogReady = true;
+      window.dispatchEvent(new CustomEvent("cloudstr-products-updated"));
+      return;
+    }
+    replaceCatalog(snap.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+  } catch (err) {
+    console.warn("[cloudStr] Could not load products from Firestore:", err);
+    window.__cloudstrCatalogReady = true;
+  }
+})();
+
 function getAllProducts() {
   return MOCK_PRODUCTS.slice();
 }
@@ -81,7 +153,7 @@ function getNewArrivals(limit = 8) {
 
 function queryProducts({ search = "", category = "all", minPrice = 0, maxPrice = 6000, inStockOnly = false, sort = "relevance" } = {}) {
   let results = MOCK_PRODUCTS.filter((p) => {
-    const matchesSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.description || "").toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === "all" || p.category === category;
     const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
     const matchesStock = !inStockOnly || p.stock > 0;
@@ -89,7 +161,7 @@ function queryProducts({ search = "", category = "all", minPrice = 0, maxPrice =
   });
 
   switch (sort) {
-    case "customized": break; // Keep the catalog's curated product order.
+    case "customized": break;
     case "price-asc": results.sort((a, b) => a.price - b.price); break;
     case "price-desc": results.sort((a, b) => b.price - a.price); break;
     case "new": results.sort((a, b) => Number(b.isNew) - Number(a.isNew)); break;
@@ -99,12 +171,9 @@ function queryProducts({ search = "", category = "all", minPrice = 0, maxPrice =
 }
 
 function formatPrice(n) {
-  return `${CURRENCY}${n.toLocaleString("en-US")}.00`;
+  return `${CURRENCY}${Number(n || 0).toLocaleString("en-US")}.00`;
 }
 
-/* ---------------------------------------------------------------
-   Rendering helpers
---------------------------------------------------------------- */
 function cartIconSVG() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>';
 }
@@ -112,13 +181,14 @@ function cartIconSVG() {
 function renderProductCard(p) {
   const inStock = p.stock > 0;
   const discount = p.compareAt && p.compareAt > p.price ? Math.round((1 - p.price / p.compareAt) * 100) : null;
+  const image = (p.images && p.images[0]) || "";
   return `
     <article class="product-card reveal in-view" data-id="${p.id}">
       <div class="product-media">
         <a class="card-link" href="product.html?slug=${p.slug}" aria-label="View ${p.name}"></a>
         <span class="product-status badge-pill ${inStock ? "badge-instock" : "badge-outstock"}">${inStock ? "In Stock" : "Out of Stock"}</span>
         ${discount ? `<span class="product-discount">-${discount}%</span>` : ""}
-        <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+        <img src="${image}" alt="${p.name}" loading="lazy">
       </div>
       <div class="product-info">
         <h3 class="product-name">${p.name}</h3>
