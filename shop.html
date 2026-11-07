@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop — cloudStr</title>
-  <meta name="description" content="Browse the full cloudStr catalog — disposables, pod systems, nic salts, podmods, coils and cartridges, freebase e-liquid.">
-<link rel="canonical" href="https://cloudstr.vercel.app/shop.html">
+  <title>Shop Vape in Bangladesh | Pods & Disposables | cloudStr</title>
+  <meta name="description" content="Shop the cloudStr vape catalog in Bangladesh: disposables, pod devices, nic salts, coils and e-liquid. Current BDT prices and cash on delivery. 18+.">
+<link rel="canonical" href="https://cloudstr.vercel.app/shop">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -241,8 +241,10 @@
           <h5>Help</h5>
           <a href="contact.html">Contact Us</a>
           <a href="track-order.html">Track Order</a>
-          <a href="#">Shipping Policy</a>
-          <a href="#">Returns</a>
+          <a href="/shipping">Shipping Policy</a>
+          <a href="/returns">Returns</a>
+          <a href="/terms">Terms</a>
+          <a href="/privacy">Privacy</a>
         </div>
         <div>
           <h5>My Account</h5>
@@ -276,9 +278,19 @@
     const resultCount = document.getElementById("result-count");
     const params = new URLSearchParams(window.location.search);
 
+    const PATH_CATEGORY = {
+      "/disposables": "disposables",
+      "/nic-salts": "nic-salts",
+      "/pod-devices": "pod-devices",
+      "/podmod-devices": "podmod-devices",
+      "/coils": "coils-cartridges",
+      "/e-liquid": "freebase-eliquid",
+    };
     const state = {
       search: params.get("q") || "",
-      category: params.get("category") || "all",
+      category: document.body.dataset.seoCategory && document.body.dataset.seoCategory !== "all"
+        ? document.body.dataset.seoCategory
+        : (PATH_CATEGORY[window.location.pathname] || params.get("category") || "all"),
       maxPrice: 6000,
       inStockOnly: false,
       sort: ["customized", "new", "price-asc", "price-desc"].includes(params.get("sort")) ? params.get("sort") : "relevance",
@@ -325,9 +337,10 @@
       renderResults();
     });
 
+    document.addEventListener("cloudstr-products-updated", renderResults);
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("sort-select").value = state.sort;
-      renderResults();
+      if (window.__cloudstrCatalogReady || !grid.querySelector("[data-ssr]")) renderResults();
     });
   </script>
 </body>

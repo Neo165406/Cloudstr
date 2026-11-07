@@ -195,8 +195,10 @@
           <h5>Help</h5>
           <a href="contact.html">Contact Us</a>
           <a href="track-order.html">Track Order</a>
-          <a href="#">Shipping Policy</a>
-          <a href="#">Returns</a>
+          <a href="/shipping">Shipping Policy</a>
+          <a href="/returns">Returns</a>
+          <a href="/terms">Terms</a>
+          <a href="/privacy">Privacy</a>
         </div>
         <div>
           <h5>My Account</h5>
@@ -229,17 +231,31 @@
     const slug = new URLSearchParams(window.location.search).get("slug")
       || (window.location.pathname.match(/^\/product\/([^/?#]+)/) || [])[1]
       || null;
-    const product = slug ? getProductBySlug(slug) : null;
     const root = document.getElementById("product-root");
+    let product = slug ? getProductBySlug(slug) : null;
 
-    if (!product) {
+    if (!product && !window.__cloudstrCatalogReady) {
+      document.addEventListener("cloudstr-products-updated", () => {
+        if (root.dataset.hydrated === "1") return;
+        product = slug ? getProductBySlug(slug) : null;
+        if (!product) {
+          root.innerHTML = `<div class="empty-state">
+        <h3 style="margin-bottom:0.5rem;">We couldn't find that product</h3>
+        <p style="margin-bottom:1.5rem;">It may have been renamed or removed from the catalog.</p>
+        <a href="/shop" class="btn btn-primary">Back to shop</a></div>`;
+          return;
+        }
+        root.dataset.hydrated = "1";
+        window.location.reload();
+      }, { once: true });
+    } else if (!product) {
       root.innerHTML = `<div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
         <h3 style="margin-bottom:0.5rem;">We couldn't find that product</h3>
         <p style="margin-bottom:1.5rem;">It may have been renamed or removed from the catalog.</p>
         <a href="shop.html" class="btn btn-primary">Back to shop</a></div>`;
     } else {
-      document.title = product.name + " — cloudStr";
+      document.title = product.name + " Price in Bangladesh | cloudStr";
       const inStock = product.stock > 0;
 
       const specsRows = Object.entries(product.specs).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")
@@ -261,7 +277,7 @@
           </div>
           <div class="reveal in-view">
             <span class="badge-pill ${inStock ? "badge-instock" : "badge-outstock"}">${inStock ? "In Stock" : "Out of Stock"}</span>
-            <h1 style="margin-top:0.6rem;">${product.name}</h1>
+            <h1 style="margin-top:0.6rem;">${product.name} Price in BD</h1>
             <p class="lede" style="margin-top:0.6rem;">${product.description}</p>
             <div class="detail-price-row">
               <span class="detail-price">${formatPrice(product.price)}</span>

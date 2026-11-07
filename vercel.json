@@ -1,1 +1,236 @@
-{}
+{
+  "regions": [
+    "bom1"
+  ],
+  "functions": {
+    "api/home-page.js": {
+      "includeFiles": "index.html"
+    },
+    "api/shop-page.js": {
+      "includeFiles": "shop.html"
+    },
+    "api/product-page.js": {
+      "includeFiles": "product.html"
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "max-image-preview:large, max-snippet:-1"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/about.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/contact.html",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/shipping.html",
+      "destination": "/shipping",
+      "permanent": true
+    },
+    {
+      "source": "/returns.html",
+      "destination": "/returns",
+      "permanent": true
+    },
+    {
+      "source": "/terms.html",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/track-order.html",
+      "destination": "/track-order",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "disposables"
+        }
+      ],
+      "destination": "/disposables",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "nic-salts"
+        }
+      ],
+      "destination": "/nic-salts",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "pod-devices"
+        }
+      ],
+      "destination": "/pod-devices",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "podmod-devices"
+        }
+      ],
+      "destination": "/podmod-devices",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "coils-cartridges"
+        }
+      ],
+      "destination": "/coils",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "category",
+          "value": "freebase-eliquid"
+        }
+      ],
+      "destination": "/e-liquid",
+      "permanent": true
+    },
+    {
+      "source": "/shop.html",
+      "destination": "/shop",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/disposables",
+      "destination": "/api/shop-page?category=disposables"
+    },
+    {
+      "source": "/nic-salts",
+      "destination": "/api/shop-page?category=nic-salts"
+    },
+    {
+      "source": "/pod-devices",
+      "destination": "/api/shop-page?category=pod-devices"
+    },
+    {
+      "source": "/podmod-devices",
+      "destination": "/api/shop-page?category=podmod-devices"
+    },
+    {
+      "source": "/coils",
+      "destination": "/api/shop-page?category=coils-cartridges"
+    },
+    {
+      "source": "/e-liquid",
+      "destination": "/api/shop-page?category=freebase-eliquid"
+    },
+    {
+      "source": "/shop",
+      "destination": "/api/shop-page"
+    },
+    {
+      "source": "/product/:slug",
+      "destination": "/api/product-page?slug=:slug"
+    },
+    {
+      "source": "/product.html",
+      "destination": "/api/product-page"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/shipping",
+      "destination": "/shipping.html"
+    },
+    {
+      "source": "/returns",
+      "destination": "/returns.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/track-order",
+      "destination": "/track-order.html"
+    },
+    {
+      "source": "/",
+      "destination": "/api/home-page"
+    }
+  ]
+}

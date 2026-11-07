@@ -132,6 +132,7 @@ function loadProducts() {
   } catch (err) {
     console.warn("[cloudStr] Could not load products from Firestore:", err);
     window.__cloudstrCatalogReady = true;
+    window.dispatchEvent(new CustomEvent("cloudstr-products-updated"));
   }
 })();
 
@@ -178,6 +179,15 @@ function cartIconSVG() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>';
 }
 
+const CATEGORY_PATHS = {
+  disposables: "/disposables",
+  "nic-salts": "/nic-salts",
+  "pod-devices": "/pod-devices",
+  "podmod-devices": "/podmod-devices",
+  "coils-cartridges": "/coils",
+  "freebase-eliquid": "/e-liquid",
+};
+
 function renderProductCard(p) {
   const inStock = p.stock > 0;
   const discount = p.compareAt && p.compareAt > p.price ? Math.round((1 - p.price / p.compareAt) * 100) : null;
@@ -185,7 +195,7 @@ function renderProductCard(p) {
   return `
     <article class="product-card reveal in-view" data-id="${p.id}">
       <div class="product-media">
-        <a class="card-link" href="product.html?slug=${p.slug}" aria-label="View ${p.name}"></a>
+        <a class="card-link" href="/product/${p.slug}" aria-label="View ${p.name}"></a>
         <span class="product-status badge-pill ${inStock ? "badge-instock" : "badge-outstock"}">${inStock ? "In Stock" : "Out of Stock"}</span>
         ${discount ? `<span class="product-discount">-${discount}%</span>` : ""}
         <img src="${image}" alt="${p.name}" loading="lazy">
@@ -215,7 +225,7 @@ function renderCategoryRow(categoryKey) {
   return `
     <div class="section-strip reveal in-view">
       <h2>${CATEGORY_LABELS[categoryKey]}</h2>
-      <a class="see-all" href="shop.html?category=${categoryKey}">See All</a>
+      <a class="see-all" href="${CATEGORY_PATHS[categoryKey] || "/shop"}">See All</a>
     </div>
     <div class="product-grid">${products.map(renderProductCard).join("")}</div>
   `;
