@@ -1,1 +1,97 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — cloudStr</title>
+  <meta name="description" content="Product detail on cloudStr — a concept vape storefront. 18+ only, working cart and checkout (Cash on Delivery).">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- RESTORE_MARKER: full file will be pushed via successive updates if truncated -->
+  <div id="age-gate" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+    <div class="age-card">
+      <span class="badge-pill">18+ Only</span>
+      <h2 id="age-gate-title">Are you 18 years of age or older?</h2>
+      <p>cloudStr sells nicotine vaping products. You must confirm your age to continue.</p>
+      <div class="age-actions">
+        <button class="btn btn-ghost" id="age-exit">Exit</button>
+        <button class="btn btn-primary" id="age-enter">Yes, I'm 18+</button>
+      </div>
+    </div>
+  </div>
+  <main class="section"><div class="wrap" id="product-root"></div></main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/card-motion.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const slug = new URLSearchParams(window.location.search).get("slug")
+      || (window.location.pathname.match(/^\/product\/([^/?#]+)/) || [])[1]
+      || null;
+    const root = document.getElementById("product-root");
+    function renderProductPage(product) {
+      if (!product) {
+        root.innerHTML = `<div class=\"empty-state\"><h3>We couldn't find that product</h3><a href=\"/shop\" class=\"btn btn-primary\">Back to shop</a></div>`;
+        return;
+      }
+      document.title = product.name + " Price in Bangladesh | cloudStr";
+      const inStock = product.stock > 0;
+      const specsRows = Object.entries(product.specs || {}).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("") || `<tr><td colspan=\"2\">No specifications listed.</td></tr>`;
+      root.innerHTML = `
+        <div class=\"breadcrumbs\"><a href=\"/\">Home</a> / <a href=\"/shop\">${(CATEGORY_LABELS||{})[product.category]||product.category}</a> / <span>${product.name}</span></div>
+        <div class=\"product-detail\">
+          <div>
+            <div class=\"gallery-main\"><img id=\"gallery-main-img\" src=\"${(product.images||[])[0]||''}\" alt=\"${product.name}\"></div>
+          </div>
+          <div>
+            <span class=\"badge-pill ${inStock ? 'badge-instock' : 'badge-outstock'}\">${inStock ? 'In Stock' : 'Out of Stock'}</span>
+            <h1 style=\"margin-top:0.6rem;\">${product.name} Price in BD</h1>
+            ${product.hideDescription ? '' : `<p class=\"lede\" style=\"margin-top:0.6rem;\">${product.description || ''}</p>`}
+            <div class=\"detail-price-row\"><span class=\"detail-price\">${formatPrice(product.price)}</span></div>
+            <div class=\"notice-box\"><span>18+ only. Nicotine products are addictive.</span></div>
+            <div class=\"detail-actions\">
+              <div class=\"qty-stepper\"><button type=\"button\" id=\"qty-minus\">−</button><span id=\"qty-value\">1</span><button type=\"button\" id=\"qty-plus\">+</button></div>
+              <button class=\"btn btn-primary\" id=\"add-to-cart-btn\" ${inStock ? '' : 'disabled'} style=\"flex:1;\">${inStock ? 'Add to Cart' : 'Out of Stock'}</button>
+            </div>
+            <div class=\"tabs\">
+              <div class=\"tab-list\" role=\"tablist\">
+                ${product.hideDescription ? '' : `<button class=\"tab-btn active\" data-tab=\"desc\">Description</button>`}
+                <button class=\"tab-btn ${product.hideDescription ? 'active' : ''}\" data-tab=\"specs\">Specs</button>
+                <button class=\"tab-btn\" data-tab=\"reviews\">Reviews</button>
+              </div>
+              ${product.hideDescription ? '' : `<div class=\"tab-panel active\" data-panel=\"desc\"><p>${product.description || ''}</p></div>`}
+              <div class=\"tab-panel ${product.hideDescription ? 'active' : ''}\" data-panel=\"specs\"><table class=\"spec-table\">${specsRows}</table></div>
+              <div class=\"tab-panel\" data-panel=\"reviews\"><p style=\"color:var(--muted);\">No reviews yet for this product.</p></div>
+            </div>
+          </div>
+        </div>`;
+      let qty = 1;
+      const qtyEl = document.getElementById('qty-value');
+      document.getElementById('qty-minus')?.addEventListener('click', () => { qty = Math.max(1, qty - 1); qtyEl.textContent = qty; });
+      document.getElementById('qty-plus')?.addEventListener('click', () => { qty += 1; qtyEl.textContent = qty; });
+      document.getElementById('add-to-cart-btn')?.addEventListener('click', () => { if (typeof addToCart === 'function') addToCart(product.id, qty); });
+      document.querySelectorAll('.tab-btn').forEach((btn) => btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelector(`[data-panel=\"${btn.dataset.tab}\"]`)?.classList.add('active');
+      }));
+    }
+    let product = slug ? getProductBySlug(slug) : null;
+    if (product) {
+      renderProductPage(product);
+    } else if (!window.__cloudstrCatalogReady) {
+      document.addEventListener('cloudstr-products-updated', () => {
+        product = slug ? getProductBySlug(slug) : null;
+        renderProductPage(product);
+      }, { once: true });
+    } else {
+      renderProductPage(null);
+    }
+  </script>
+</body>
+</html>
