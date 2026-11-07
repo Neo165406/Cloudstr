@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Cloudstr — A Modern Concept Storefront</title>
+  <desc id="desc">Neutral Cloudstr brand identity graphic on a charcoal background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#171a18"/><stop offset="1" stop-color="#080a09"/></linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#c7f36b" stop-opacity=".16"/><stop offset="1" stop-color="#c7f36b" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="940" cy="150" r="390" fill="url(#glow)"/>
+  <path d="M72 72H1128V558H72Z" fill="none" stroke="#c7f36b" stroke-opacity=".28"/>
+  <path d="M100 128H160" stroke="#c7f36b" stroke-width="5"/>
+  <text x="100" y="310" fill="#f3f4ee" font-family="Arial,Helvetica,sans-serif" font-size="112" font-weight="800" letter-spacing="7">CLOUDSTR</text>
+  <text x="105" y="382" fill="#c7f36b" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" letter-spacing="7">A MODERN CONCEPT STOREFRONT</text>
+  <text x="105" y="478" fill="#a7aaa1" font-family="Arial,Helvetica,sans-serif" font-size="20" letter-spacing="3">DIGITAL BRAND EXPERIENCE</text>
+  <text x="1095" y="510" fill="#777d70" font-family="Arial,Helvetica,sans-serif" font-size="16" text-anchor="end" letter-spacing="2">18+ CONCEPT</text>
+</svg>
