@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /cart.html
+Disallow: /checkout.html
+Disallow: /track-order
 
 Sitemap: https://cloudstr.vercel.app/sitemap.xml
