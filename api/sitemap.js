@@ -1,7 +1,7 @@
 const seo = require('./_seo');
 
 function xmlEscape(value) {
-  return String(value).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
 function urlTag(loc, priority, changefreq, lastmod) {
