@@ -45,30 +45,51 @@ function render(product) {
     </div>`;
 }
 
-function schema(product, url, description) {
+function schemaDescription(product, fallback) {
+  // Use the real product description when it is visible on the page.
+  if (!product.hideDescription && typeof product.description === 'string') {
+    const own = seo.clip(product.description, 500);
+    if (own) return own;
+  }
+  return fallback;
+}
+
+function schema(product, url, fallbackDescription) {
   const images = (Array.isArray(product.images) ? product.images : []).filter((src) => /^https?:\/\//.test(String(src)));
   const price = Number(product.price);
+  const hasPrice = product.price !== null && product.price !== '' && Number.isFinite(price) && price >= 0;
   const cat = seo.CATEGORIES[product.category];
+  const brandName = typeof product.brand === 'string' ? product.brand.trim() : '';
+
+  const item = {
+    '@type': 'Product',
+    name: product.name,
+    description: schemaDescription(product, fallbackDescription),
+    sku: product.id,
+    category: cat ? cat.label : product.category
+  };
+
+  // Only include fields that have real data, so Google never sees empty values.
+  if (images.length) item.image = images;
+  if (brandName) item.brand = { '@type': 'Brand', name: brandName };
+
+  if (hasPrice) {
+    item.offers = {
+      '@type': 'Offer',
+      url,
+      priceCurrency: 'BDT',
+      price: price.toFixed(2),
+      availability: Number(product.stock) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      areaServed: 'BD',
+      seller: { '@type': 'Organization', name: 'cloudStr', url: seo.SITE + '/' }
+    };
+  }
+
   return {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'Product',
-        name: product.name,
-        description,
-        image: images,
-        sku: product.id,
-        brand: { '@type': 'Brand', name: 'cloudStr' },
-        category: cat ? cat.label : product.category,
-        offers: {
-          '@type': 'Offer',
-          url,
-          priceCurrency: 'BDT',
-          price: Number.isFinite(price) ? price.toFixed(2) : undefined,
-          availability: Number(product.stock) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-          areaServed: 'BD'
-        }
-      },
+      item,
       seo.breadcrumbSchema([
         { name: 'Home', path: '/' },
         { name: cat ? cat.label : 'Shop', path: cat ? cat.path : '/shop' },
