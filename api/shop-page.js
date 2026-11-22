@@ -29,7 +29,16 @@ module.exports = async function handler(req, res) {
   };
   let html = seo.readTemplate('shop.html');
   let products = [];
-  try { products = await seo.fetchAllProducts(); } catch (error) { console.error(error); }
+  try {
+    products = await seo.fetchAllProducts();
+  } catch (error) {
+    console.error('Shop inventory fetch failed:', error);
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Retry-After', '120');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.status(503).send('Catalog temporarily unavailable. Please try again shortly.');
+    return;
+  }
   const visible = cat ? products.filter((p) => p.category === key) : products;
   const robots = cat && !visible.length ? 'noindex, follow' : 'index,follow,max-image-preview:large,max-snippet:-1';
   const url = seo.SITE + page.path;
