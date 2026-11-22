@@ -97,11 +97,22 @@ async function syncProductsToFirestore(list) {
   return true;
 }
 
+// Tells the server to refresh the Typesense search index after a catalog save.
+// Harmless if Typesense is not configured (the endpoint just answers 503).
+function requestSearchReindex() {
+  try {
+    fetch("/api/typesense-sync", { method: "POST", keepalive: true }).catch(() => {});
+  } catch (e) {}
+}
+
 function saveProducts(list) {
   const saved = writeLocalProducts(cleanProductList(list));
   if (!saved) return false;
   replaceCatalog(list, { persistLocal: false, notify: false });
-  window.cloudstrProductSync = syncProductsToFirestore(MOCK_PRODUCTS.slice()).catch((err) => {
+  window.cloudstrProductSync = syncProductsToFirestore(MOCK_PRODUCTS.slice()).then((ok) => {
+    if (ok) requestSearchReindex();
+    return ok;
+  }).catch((err) => {
     console.warn("[cloudStr] Firestore product sync failed:", err);
     window.dispatchEvent(new CustomEvent("cloudstr-products-sync-error", { detail: err }));
     return false;
