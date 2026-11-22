@@ -89,6 +89,25 @@ function initSearchOverlay() {
 }
 
 /* ---------------------------------------------------------------
+   Typesense search (optional)
+   Loads js/typesense-search.js only when js/typesense-config.js
+   has a host. Otherwise the site keeps using local search.
+--------------------------------------------------------------- */
+function loadTypesenseSearch() {
+  if (document.querySelector("script[data-ts-search]")) return;
+  const config = document.createElement("script");
+  config.src = "/js/typesense-config.js";
+  config.onload = () => {
+    if (!window.CLOUDSTR_TYPESENSE || !window.CLOUDSTR_TYPESENSE.host) return;
+    const search = document.createElement("script");
+    search.src = "/js/typesense-search.js";
+    search.dataset.tsSearch = "1";
+    document.body.appendChild(search);
+  };
+  document.body.appendChild(config);
+}
+
+/* ---------------------------------------------------------------
    Toasts
 --------------------------------------------------------------- */
 function showToast(message, type = "default") {
@@ -154,4 +173,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initSearchOverlay();
   initRevealObserver();
   initPageLoader();
+  loadTypesenseSearch();
 });
