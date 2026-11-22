@@ -87,7 +87,16 @@ module.exports = async function handler(req, res) {
     return;
   }
   let products = [];
-  try { products = await seo.fetchAllProducts(); } catch (error) { console.error(error); }
+  try {
+    products = await seo.fetchAllProducts();
+  } catch (error) {
+    console.error('Product inventory fetch failed:', error);
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Retry-After', '120');
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    res.status(503).send('Product data temporarily unavailable. Please try again shortly.');
+    return;
+  }
   const product = products.find((item) => item.slug === slug);
   let html = seo.readTemplate('product.html');
   if (!product) {
