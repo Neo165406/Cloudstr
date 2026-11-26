@@ -1,0 +1,319 @@
+/* cloudStr — scroll motion layer
+   ----------------------------------------------------------------
+   Scroll reveal, sticky scrolling section, parallax, 3D-style layers
+   and animated gradient shapes.
+
+   Progressive enhancement: everything below that hides or pins content
+   is scoped to `.mo-ready`, a class js/motion.js adds only when motion
+   is allowed (no prefers-reduced-motion, IntersectionObserver present).
+   Without it the page is a normal, fully visible, static layout.
+*/
+
+:root {
+  --mo-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mo-amber: #ffa04d;
+  --mo-orange: #ff7a1a;
+  --mo-ember: #ff5a00;
+  --mo-rust: #b8340a;
+}
+
+/* ================================================================
+   1. Scroll-triggered reveal
+   ================================================================ */
+.mo-ready [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0);
+  transition:
+    opacity 0.8s var(--mo-ease) var(--mo-delay, 0ms),
+    transform 0.9s var(--mo-ease) var(--mo-delay, 0ms);
+}
+.mo-ready [data-reveal="left"]  { transform: translate3d(-40px, 0, 0); }
+.mo-ready [data-reveal="right"] { transform: translate3d(40px, 0, 0); }
+.mo-ready [data-reveal="scale"] { transform: scale(0.92); }
+.mo-ready [data-reveal].is-visible { opacity: 1; transform: none; }
+
+/* Existing storefront sections already carry `.reveal`; give them the
+   same entrance now that the reveal observer (js/app.js) toggles
+   `.in-view` on them. */
+.mo-ready .reveal {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition: opacity 0.8s var(--mo-ease), transform 0.9s var(--mo-ease);
+}
+.mo-ready .reveal.in-view { opacity: 1; transform: none; }
+
+/* ================================================================
+   2. Showcase section
+   ================================================================ */
+.mo-showcase { margin: clamp(56px, 9vw, 120px) 0 0; }
+
+.mo-intro { max-width: 40rem; margin: 0 0 clamp(22px, 4vw, 40px); }
+.mo-kicker {
+  display: block;
+  margin: 0 0 14px;
+  color: var(--brand, var(--mo-orange));
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.mo-intro h2 {
+  margin: 0 0 14px;
+  color: #f6f1eb;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.mo-intro h2 em { color: var(--mo-orange); font-style: normal; text-shadow: 0 0 30px rgba(255, 122, 26, 0.5); }
+.mo-intro p { margin: 0; max-width: 34rem; }
+
+/* Pinned track: tall wrapper + sticky stage (only when motion is on) */
+.mo-track { position: relative; }
+.mo-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(20px, 4vw, 64px);
+  padding: clamp(28px, 5vw, 72px);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09));
+  border-radius: 28px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01) 55%),
+    #0d0d0f;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  isolation: isolate;
+  --p: 0.5;
+}
+.mo-ready .mo-track { height: 300vh; }
+.mo-ready .mo-stage {
+  position: sticky;
+  top: 88px; /* clears the sticky site header */
+  height: calc(100vh - 108px);
+  height: calc(100svh - 108px);
+  min-height: 520px;
+}
+
+/* ================================================================
+   3. Animated gradient shapes + parallax wrappers
+   ================================================================ */
+.mo-aurora { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.mo-par { position: absolute; will-change: transform; }
+.mo-par--a { width: min(46vw, 520px); left: -10%; top: -18%; }
+.mo-par--b { width: min(38vw, 440px); right: -8%; bottom: -22%; }
+.mo-par--c { width: min(22vw, 240px); left: 42%; top: 58%; }
+
+.mo-blob {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%;
+  background: linear-gradient(135deg, var(--mo-amber), var(--mo-ember), var(--mo-rust), var(--mo-amber));
+  background-size: 300% 300%;
+  filter: blur(46px);
+  opacity: 0.5;
+  animation:
+    mo-gradient 12s ease-in-out infinite,
+    mo-morph 18s ease-in-out infinite;
+}
+.mo-par--b .mo-blob { animation-duration: 15s, 22s; animation-direction: reverse, normal; opacity: 0.38; }
+.mo-par--c .mo-blob { filter: blur(30px); animation-duration: 9s, 14s; opacity: 0.55; }
+
+@keyframes mo-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes mo-morph {
+  0%, 100% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; }
+  33% { border-radius: 60% 40% 40% 60% / 55% 62% 38% 45%; }
+  66% { border-radius: 38% 62% 55% 45% / 62% 38% 58% 42%; }
+}
+
+/* ================================================================
+   4. Copy column (steps)
+   ================================================================ */
+.mo-copy { position: relative; z-index: 2; display: grid; gap: 28px; }
+.mo-step h3 {
+  margin: 10px 0 12px;
+  color: #fff;
+  font-size: clamp(1.9rem, 4.2vw, 3.4rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+.mo-step p { margin: 0; max-width: 28rem; }
+
+/* Motion on: steps stack in one grid cell and cross-fade by scroll */
+.mo-ready .mo-copy { gap: 0; }
+.mo-ready .mo-step {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity 0.55s var(--mo-ease), transform 0.7s var(--mo-ease);
+  pointer-events: none;
+}
+.mo-ready .mo-step.is-active { opacity: 1; transform: none; pointer-events: auto; }
+
+.mo-meter { display: none; }
+.mo-ready .mo-meter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 34px;
+  color: var(--muted, #a8a29b);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.mo-bar { flex: 1; max-width: 220px; height: 2px; background: rgba(255, 255, 255, 0.12); overflow: hidden; border-radius: 2px; }
+.mo-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--mo-amber), var(--mo-ember));
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.7);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+}
+
+/* ================================================================
+   5. Abstract 3D-style layers
+   ================================================================ */
+.mo-scene {
+  position: relative;
+  height: min(62vh, 520px);
+  perspective: 1100px;
+  perspective-origin: 50% 38%;
+}
+.mo-rig {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+  transform: rotateX(54deg) rotateZ(-28deg);
+}
+.mo-ready .mo-rig {
+  transform:
+    rotateX(calc(64deg - var(--p, 0.5) * 24deg))
+    rotateZ(calc(-40deg + var(--p, 0.5) * 80deg));
+}
+.mo-layer {
+  position: absolute;
+  width: min(60%, 300px);
+  aspect-ratio: 1;
+  border-radius: 26%;
+  border: 1px solid rgba(255, 160, 77, 0.45);
+  background: linear-gradient(135deg, rgba(255, 160, 77, 0.3), rgba(255, 90, 0, 0.08) 60%, rgba(255, 255, 255, 0.04));
+  box-shadow: 0 0 60px rgba(255, 106, 0, 0.16), inset 0 0 30px rgba(255, 160, 77, 0.12);
+  transform: translateZ(calc(var(--i, 0) * 60px));
+}
+.mo-ready .mo-layer {
+  /* Layers pull apart as the section scrolls */
+  transform: translateZ(calc(var(--i, 0) * (26px + var(--p, 0.5) * 84px)));
+}
+.mo-layer--1 { --i: -1; opacity: 0.55; }
+.mo-layer--2 { --i: 0; opacity: 0.8; }
+.mo-layer--3 { --i: 1; opacity: 1; background: linear-gradient(135deg, rgba(255, 160, 77, 0.55), rgba(255, 90, 0, 0.2) 60%, rgba(255, 255, 255, 0.06)); }
+.mo-ring {
+  position: absolute;
+  width: min(86%, 430px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 160, 77, 0.5);
+  transform: translateZ(calc(var(--i, 0) * 60px));
+  --i: 2;
+}
+.mo-ready .mo-ring { transform: translateZ(calc(var(--i, 0) * (26px + var(--p, 0.5) * 84px))); }
+
+.mo-orb-wrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.mo-orb-wrap .mo-par { position: relative; width: 100%; display: grid; place-items: center; }
+.mo-orb {
+  width: min(34%, 170px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffe2c4, var(--mo-amber) 22%, var(--mo-ember) 52%, #3a1203 82%);
+  box-shadow: 0 0 80px rgba(255, 106, 0, 0.5), inset -14px -18px 36px rgba(0, 0, 0, 0.45);
+  animation: mo-float 7s ease-in-out infinite;
+}
+@keyframes mo-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -14px, 0); }
+}
+
+/* ================================================================
+   6. Feature cards (staggered reveal)
+   ================================================================ */
+.mo-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.mo-card {
+  padding: 22px 22px 24px;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09));
+  border-radius: 18px;
+  background: var(--glass-sheen, none), rgba(20, 20, 23, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 32px rgba(0, 0, 0, 0.3);
+}
+.mo-card b {
+  display: block;
+  margin-bottom: 8px;
+  color: #f3eee8;
+  font-family: var(--font-display, inherit);
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+}
+.mo-card span { color: var(--muted, #a8a29b); font-size: 0.88rem; line-height: 1.6; }
+
+/* ================================================================
+   7. Mobile
+   ================================================================ */
+@media (max-width: 820px) {
+  .mo-stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 6px;
+    padding: 22px 20px 26px;
+    border-radius: 20px;
+  }
+  .mo-ready .mo-track { height: 260vh; }
+  .mo-ready .mo-stage { top: 72px; height: calc(100vh - 88px); height: calc(100svh - 88px); min-height: 480px; }
+  .mo-scene { order: -1; height: 38vh; min-height: 210px; }
+  .mo-layer { width: min(58%, 190px); }
+  .mo-ring { width: min(84%, 260px); }
+  .mo-orb { width: min(30%, 96px); }
+  .mo-blob { filter: blur(34px); }
+  .mo-par--a { width: 70vw; }
+  .mo-par--b { width: 64vw; }
+  .mo-par--c { display: none; }
+  .mo-step h3 { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+  .mo-ready .mo-meter { margin-top: 20px; }
+  .mo-cards { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}
+@media (max-width: 420px) {
+  .mo-stage { padding: 18px 16px 22px; }
+}
+
+/* ================================================================
+   8. Reduced motion — static, fully visible, nothing pinned
+   ================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .mo-blob, .mo-orb { animation: none !important; }
+  .mo-par { transform: none !important; will-change: auto; }
+  .mo-track { height: auto !important; }
+  .mo-stage { position: relative !important; height: auto !important; min-height: 0 !important; top: auto !important; }
+  .mo-step { grid-area: auto !important; opacity: 1 !important; transform: none !important; transition: none !important; pointer-events: auto !important; }
+  .mo-copy { gap: 28px !important; }
+  .mo-meter { display: none !important; }
+  .mo-rig { transform: rotateX(54deg) rotateZ(-28deg) !important; }
+  .mo-layer, .mo-ring { transform: translateZ(calc(var(--i, 0) * 60px)) !important; }
+}

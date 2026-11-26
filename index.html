@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Shop vape devices at cloudStr in Bangladesh. Disposables, pod kits, nic salts and e-liquid with BDT prices and cash on delivery. 18+ only.">
   <meta name="twitter:image" content="https://cloudstr.vercel.app/assets/cloudstr-og.svg">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
   <div id="age-gate" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
@@ -187,6 +188,64 @@
       </section>
 
       <div id="category-rows"></div>
+
+      <section class="mo-showcase" aria-labelledby="mo-title">
+        <div class="mo-intro" data-reveal>
+          <span class="mo-kicker">Why cloudStr</span>
+          <h2 id="mo-title">Built around the <em>details.</em></h2>
+          <p>From the first browse to your doorstep, every step is designed to be clear, quick and easy to follow.</p>
+        </div>
+
+        <div class="mo-track" data-story>
+          <div class="mo-stage">
+            <div class="mo-aurora" aria-hidden="true">
+              <div class="mo-par mo-par--a" data-parallax="0.35"><i class="mo-blob"></i></div>
+              <div class="mo-par mo-par--b" data-parallax="-0.28"><i class="mo-blob"></i></div>
+              <div class="mo-par mo-par--c" data-parallax="0.5"><i class="mo-blob"></i></div>
+            </div>
+
+            <div class="mo-copy">
+              <article class="mo-step" data-step>
+                <span class="mo-kicker">01 — Selection</span>
+                <h3>Pods, disposables and e-liquid in one place.</h3>
+                <p>Browse devices, nic salts, coils and cartridges by category, with BDT prices shown on every product.</p>
+              </article>
+              <article class="mo-step" data-step>
+                <span class="mo-kicker">02 — Delivery</span>
+                <h3>Fast nationwide delivery.</h3>
+                <p>Orders go out across Bangladesh, and you can follow yours any time from the Track Order page.</p>
+              </article>
+              <article class="mo-step" data-step>
+                <span class="mo-kicker">03 — Payment</span>
+                <h3>Pay when it arrives.</h3>
+                <p>Cash on delivery keeps checkout simple. Our products are for adults only, so age confirmation is required.</p>
+              </article>
+              <div class="mo-meter" aria-hidden="true">
+                <span data-step-count>01 / 03</span>
+                <span class="mo-bar"><i></i></span>
+              </div>
+            </div>
+
+            <div class="mo-scene" aria-hidden="true">
+              <div class="mo-rig">
+                <i class="mo-ring"></i>
+                <i class="mo-layer mo-layer--1"></i>
+                <i class="mo-layer mo-layer--2"></i>
+                <i class="mo-layer mo-layer--3"></i>
+              </div>
+              <div class="mo-orb-wrap">
+                <div class="mo-par" data-parallax="0.2"><i class="mo-orb"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mo-cards" data-reveal-group>
+          <div class="mo-card" data-reveal><b>100% authentic</b><span>Every device and e-liquid we list is guaranteed genuine.</span></div>
+          <div class="mo-card" data-reveal><b>Cash on delivery</b><span>Pay at your door when the order arrives.</span></div>
+          <div class="mo-card" data-reveal><b>Support 12 pm – 10 pm</b><span>Call the hotline or message us on WhatsApp.</span></div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -276,6 +335,7 @@
   <script src="js/featured.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/motion.js"></script>
   <script>
 
     function renderCloudstrReels() {
