@@ -60,9 +60,87 @@
     viewObserver.observe(el);
   };
 
+  /* ---- Product showcase --------------------------------------------
+     The 3D scene shows real products from the admin-managed catalog
+     (js/products.js + js/featured.js), one per step. Their photos come
+     from the "Product images" field in admin.html. With no usable
+     product the original orb is left in place. */
+  const SHOT_COUNT = 3;
+  const usableUrl = (u) => typeof u === "string" && u.trim() !== "" && !/^\s*(javascript|vbscript):/i.test(u);
+
+  const pickProducts = () => {
+    try {
+      if (typeof getAllProducts !== "function") return [];
+      const out = [];
+      const seen = new Set();
+      const add = (p) => {
+        if (!p || seen.has(p.id) || out.length >= SHOT_COUNT) return;
+        if (!Array.isArray(p.images) || !usableUrl(p.images[0])) return;
+        seen.add(p.id);
+        out.push(p);
+      };
+      if (typeof getBestProducts === "function") getBestProducts(SHOT_COUNT).forEach(add);
+      getAllProducts().forEach(add);
+      return out;
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const syncShots = (story, idx) => {
+    const shots = story.track.querySelectorAll(".mo-shot");
+    shots.forEach((shot, i) => shot.classList.toggle("is-active", i === idx % shots.length));
+  };
+
+  const renderShots = (story) => {
+    const wrap = story.track.querySelector(".mo-orb-wrap");
+    const host = wrap && wrap.querySelector(".mo-par");
+    if (!host) return;
+    const products = pickProducts();
+    let shots = host.querySelector(".mo-shots");
+    if (!shots) {
+      shots = document.createElement("div");
+      shots.className = "mo-shots";
+      host.appendChild(shots);
+    }
+    shots.textContent = "";
+    products.forEach((p, i) => {
+      const fig = document.createElement("figure");
+      fig.className = "mo-shot";
+      const img = new Image();
+      img.src = p.images[0].trim();
+      img.alt = "";
+      img.decoding = "async";
+      if (i > 0) img.loading = "lazy";
+      fig.appendChild(img);
+      shots.appendChild(fig);
+    });
+    wrap.classList.toggle("has-shots", products.length > 0);
+
+    // One "Shop <product>" link per step (the scene itself stays decorative)
+    story.steps.forEach((step, i) => {
+      let link = step.querySelector(".mo-link");
+      const p = products.length ? products[i % products.length] : null;
+      if (!p || !p.slug) {
+        if (link) link.remove();
+        return;
+      }
+      if (!link) {
+        link = document.createElement("a");
+        link.className = "mo-link";
+        step.appendChild(link);
+      }
+      link.href = "/product/" + encodeURIComponent(p.slug);
+      const price = typeof formatPrice === "function" ? " · " + formatPrice(p.price) : "";
+      link.textContent = "Shop " + p.name + price + " →";
+    });
+    syncShots(story, story.idx >= 0 ? story.idx : 0);
+  };
+
   const setActiveStep = (story, idx) => {
     story.idx = idx;
     story.steps.forEach((step, i) => step.classList.toggle("is-active", i === idx));
+    syncShots(story, idx);
     if (story.count) story.count.textContent = "0" + (idx + 1) + " / 0" + story.steps.length;
   };
 
@@ -149,8 +227,14 @@
       s.steps.forEach((step) => step.classList.remove("is-active"));
       s.idx = -1;
       s.visible = false;
+      syncShots(s, 0);
     });
   };
+
+  // Products render whether or not motion is on; the catalog can also arrive
+  // (or change) after first paint when Firestore hydrates.
+  stories.forEach(renderShots);
+  window.addEventListener("cloudstr-products-updated", () => stories.forEach(renderShots));
 
   const apply = () => (mq.matches ? stop() : start());
   apply();
